@@ -1,0 +1,12 @@
+/* hard fix at employee.css */
+thead tr th:first-child, tbody tr td:first-child {
+    width: auto;
+}
+
+thead tr th:first-child, tbody tr td:first-child {
+    width: auto;
+}
+
+tbody tr td:nth-child(5) div {
+    justify-content: center;
+}

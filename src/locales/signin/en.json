@@ -1,0 +1,15 @@
+{
+	"title": "Welcome back!",
+	"remind": "Please enter your credentials to sign in!",
+	"email": "Email",
+	"password": "Password",
+	"error": {
+		"email": {
+			"empty": "* Email cannot be empty",
+			"invalid": "* Email is not valid"
+		},
+		"password": {
+			"empty": "* Password cannot be empty"
+		}
+	}
+}

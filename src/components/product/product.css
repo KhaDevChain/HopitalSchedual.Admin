@@ -1,0 +1,27 @@
+tbody tr td:nth-child(2){
+    width: 9%;
+}
+thead tr th:nth-child(2){
+    width: 9%;
+}
+/* nanme */
+tbody tr td:nth-child(3){
+    width: 20%;
+}
+thead tr th:nth-child(3){
+    width: 20%;
+}
+/* address */
+tbody tr td:nth-child(4){
+    width: 40%;
+}
+thead tr th:nth-child(4){
+    width: 40%;
+}
+
+/* actions */
+/* tbody tr td:nth-child(6) div {
+    justify-items: end;
+} */
+
+

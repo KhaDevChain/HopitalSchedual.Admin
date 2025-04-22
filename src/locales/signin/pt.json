@@ -1,0 +1,15 @@
+{
+	"title": "Bem-vindo de volta!",
+	"remind": "Por favor, insira suas credenciais para entrar!",
+	"email": "E-mail",
+	"password": "Senha",
+	"error": {
+		"email": {
+			"empty": "* E-mail não pode estar vazio",
+			"invalid": "* E-mail não é válido"
+		},
+		"password": {
+			"empty": "* Senha não pode estar vazio"
+		}
+	}
+}
