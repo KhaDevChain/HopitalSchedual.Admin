@@ -32,16 +32,17 @@ export const Layout = (props: Props) => {
 	}, [appState.expired]);
 
     useEffect(() => {
-        const handleResize = () => {
-            if (window.innerWidth < 768) {
-                setIsSidebarCollapsed(true);
-            } else {
-                setIsSidebarCollapsed(false);
-            }
-        };
-        handleResize();
-        window.addEventListener("resize", handleResize);
-        return () => window.removeEventListener("resize", handleResize);
+        // const handleResize = () => {
+        //     if (window.innerWidth < 768) {
+        //         setIsSidebarCollapsed(true);
+        //     } else {
+        //         setIsSidebarCollapsed(false);
+        //     }
+        // };
+        // handleResize();
+        // window.addEventListener("resize", handleResize);
+        // return () => window.removeEventListener("resize", handleResize);
+        setIsSidebarCollapsed(true);
     }, []);
     return (
         <>

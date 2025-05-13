@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Eye, EyeOff, Loader } from 'lucide-react';
 import { FormikErrors, useFormik } from "formik";
-import logoImg from "../assets/logo/logo.svg";
+import logoImg from "../assets/logo/logo-main.png";
 import SigninModel from '@/models/signin/Signin.model';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { loginCall, setStatus } from '@/slice/signin.slice';
@@ -84,15 +84,15 @@ const Signin: React.FC = () => {
         }
     }, [signinState.status])
     return (
-        <div className="max-h-screen flex">
+        <div className="max-h-screen flex p-[30px]">
             <div className="w-full flex items-center justify-center h-screen">
                 <div className="w-full max-w-sm mt-[-130px]">
                     <div className="flex justify-center">
-                        <img src={logoImg} style={{ width: "230px", height: "230px" }} alt="Workflow"
-                            className='text-xl font-bold text-gray-900 transition-all duration-300 origin-left scale-100 opacity-100' />
+                        <img src={logoImg} style={{ width: "100px", height: "100px" }} alt="Workflow"
+                            className='text-xl font-bold text-gray-900 transition-all duration-300 origin-left scale-100 opacity-100 mb-4' />
                     </div>
-                    <h1 className="text-3xl font-bold text-left mb-2">Welcome back!</h1>
-                    <p className="text-black font-semibold text-left mb-8">Please enter your credentials to sign in!</p>
+                    <h1 className="text-3xl font-bold text-left mb-2 text-center">Welcome back!</h1>
+                    <p className="text-black font-semibold text-left mb-8 text-center">Please enter your credentials to sign in!</p>
                     <form onSubmit={formik.handleSubmit}>
                         <div className="space-y-6">
                             <div>

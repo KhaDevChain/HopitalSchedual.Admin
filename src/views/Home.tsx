@@ -115,7 +115,6 @@ const Home: FC = () => {
         <div className="flex flex-col gap-4">
         <div className="flex justify-between items-center pb-4">
         <h3 className="text-lg font-semibold">Recent Orders</h3>
-          {/* Date Filter */}
           <div className="flex items-center space-x-3">
             <input
               type="date"
@@ -137,7 +136,6 @@ const Home: FC = () => {
             <div className="relative w-full">
               <input title="search" type="text" placeholder="Quick search..."
                 className="border-none py-[8px] ps-[12px] pe-[34px] rounded-xl h-[47.99px] font-medium w-full bg-[#F5F5F5] focus:bg-white outline-blue-400"
-                
               />
             </div>
           </div>
