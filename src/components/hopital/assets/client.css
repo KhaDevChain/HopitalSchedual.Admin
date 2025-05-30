@@ -1,0 +1,8 @@
+/* hard fix at index.css */
+thead tr th:first-child {
+    width: 5%;
+  }
+  
+  tbody tr td:first-child{
+    width: 5%;
+  }

@@ -18,16 +18,8 @@ const CountrySale: React.FC = () => {
     return (
         <>
             <div className="relative flex">
-              {/* Bản đồ nền */}
-              <img
-                src="https://svgsilh.com/svg/1706054.svg"
-                alt="World Map"
-                width="50%"
-                className="opacity-30"
-              />
-
               {/* Danh sách quốc gia */}
-              <div className="relative ml-8" style={{width: "100%"}}>
+              <div className="relative" style={{width: "100%"}}>
                 {countryData.map((country, index) => (
                   <div key={index} className="flex items-center hover:bg-gray-100 p-3 rounded-lg">
                     <div className="flex items-center" style={{width: "35px", height: "40px"}}>

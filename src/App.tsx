@@ -7,6 +7,9 @@ import ProductItem from './components/product/ProductItem';
 import Home from './views/Home';
 import PeopleItem from './components/people/PeopleItem';
 import ContractList from './components/people/ContractList';
+import Hopital from './views/Hopital';
+import HopitalItem from './components/hopital/HopitalItem';
+import HopitalContractList from './components/hopital/_HopitalContractList';
 
 const SignIn = React.lazy(() => import('./views/Signin'));
 // customer
@@ -50,6 +53,23 @@ const pageList = [
   {
     path: "/peoples/contract",
     element: <Layout children={<ContractList />} target={'/peoples/contract'}></Layout>
+  },
+    // Hopital
+  {
+    path: "/hopital/list",
+    element: <Layout children={<Hopital />} target={'/hopital/list'}></Layout>
+  },
+  {
+    path: "/hopital/contact-edit",
+    element: <Layout children={<HopitalItem />} target={'/hopital/contact-edit'}></Layout>
+  },
+  {
+    path: "/hopital/contact-create",
+    element: <Layout children={<HopitalItem />} target={'/hopital/contact-create'}></Layout>
+  },
+   {
+    path: "/hopital/contract",
+    element: <Layout children={<HopitalContractList />} target={'/hopital/contract'}></Layout>
   },
   {
     path: "/clients/client-details",

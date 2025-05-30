@@ -7,6 +7,7 @@ import DropDownDate from "@/components/home/SideLeft/DropDownDate";
 import ChartRevenue from "@/components/home/SideLeft/ChartRevenue";
 import CountrySale from "@/components/home/SideLeft/CountrySale";
 import { OrderList } from "@/components/home/Table/OrderList";
+import ProgressCircle from "@/components/home/SideRight/Circle";
 
 const Home: FC = () => {
   const [selectedRange, setSelectedRange] = useState<string>("Annually");
@@ -84,20 +85,16 @@ const Home: FC = () => {
         {/* - LEFT - */}
         <div className="col-span-8 bg-white p-5">
           <div className="flex items-center justify-between">
-            <h1 className="font-bold text-xl text-gray-800">Overview</h1>
+            <h1 className="font-bold text-xl text-gray-800">Tổng quan</h1>
             <DropDownDate onChange={setSelectedRange} />
           </div>
           <ChartRevenue date={selectedRange} />
-          <div className="p-6 bg-white rounded-xl shadow-lg mt-5">
-            <h1 className="font-bold text-xl text-gray-800">Top city</h1>
-            <CountrySale />
-          </div>
         </div>
 
         {/* - RIGHT - */}
-        {/* <div className="col-span-4 space-y-6">
+        <div className="col-span-4 space-y-6">
           <div className="p-4 bg-white shadow rounded-xl">
-            <div className="flex items-center justify-between mt-8">
+            <div className="flex items-center justify-between">
               <div className="flex flex-col">
                 <h2>1.3K<span className="opacity-60 text-base font-bold"> / 1.8K Units</span></h2>
                 <div className="mt-1">Made this month year</div>
@@ -107,7 +104,22 @@ const Home: FC = () => {
               </div>
             </div>
           </div>
-        </div> */}
+          <div className="p-4 bg-white shadow rounded-xl">
+            <div className="flex items-center justify-between">
+              <div className="flex flex-col">
+                <h2>1.3K<span className="opacity-60 text-base font-bold"> / 1.8K Units</span></h2>
+                <div className="mt-1">Made this month year</div>
+              </div>
+              <div>
+                <ProgressCircle percentage={75} />
+              </div>
+            </div>
+          </div>
+          <div className="p-6 bg-white rounded-xl shadow-lg mt-5">
+            <h1 className="font-bold text-xl text-gray-800 mb-4">Đang triển khai</h1>
+            <CountrySale />
+          </div>
+        </div>
       </div>
 
       {/* - TABLER - */}

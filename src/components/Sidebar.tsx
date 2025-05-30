@@ -29,7 +29,7 @@ const menuItems = [
     section: "QUẢN LÝ",
     items: [
       { icon: CalendarArrowDown, label: "Lịch khám", href: "/transactions/transaction-list" },
-      { icon: HousePlus, label: "Bệnh viện", href: "/peoples/contact" },
+      { icon: HousePlus, label: "Bệnh viện", href: "/hopital/list" },
       { icon: UserCheck, label: "Tài khoản", href: "/accounts" },
       { icon: HeartHandshake, label: "Nhà thuốc", href: "/employees" },
       { icon: UserPlus2, label: "Bác sĩ", href: "/employees" },

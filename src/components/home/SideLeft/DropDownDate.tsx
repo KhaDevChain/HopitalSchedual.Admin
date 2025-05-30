@@ -6,8 +6,8 @@ interface DropDownDateProps {
 }
 
 const DropDownDate: FC<DropDownDateProps> = ({ onChange }) => {
-  const options: string[] = ["Annually", "Monthly", "Weekly"];
-  const [_, setSelected] = useState<string>("Annually");
+  const options: string[] = ["Mỗi ngày", "Mỗi tháng", "Mỗi tuần"];
+  const [_, setSelected] = useState<string>("Mỗi ngày");
 
   const handleSelect = (value: string) => {
     setSelected(value);

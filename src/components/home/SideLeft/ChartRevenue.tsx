@@ -34,9 +34,9 @@ const ChartRevenue: React.FC<{ date: string }> = ({ date }) => {
 
   return (
     <>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 rounded-2xl p-3 bg-blue-100 dark:bg-gray-700 mt-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 rounded-2xl bg-gray-50 p-3 dark:bg-gray-100 mt-4">
 
-        <button className={`p-4 rounded-2xl cursor-pointer ltr:text-left rtl:text-right transition duration-150 outline-hidden ${overViewSelected === 0 ? "bg-white" : "bg-gray-100"
+        <button className={`p-4 rounded-2xl cursor-pointer ltr:text-left rtl:text-right transition duration-150 outline-hidden ${overViewSelected === 0 ? "bg-white" : "bg-gray-50"
           } dark:bg-gray-900 shadow-md`}
           onClick={() => setOverViewSelected(0)}
         >
@@ -123,7 +123,7 @@ const ChartRevenue: React.FC<{ date: string }> = ({ date }) => {
         </button>
       </div>
       <div className="p-6 mt-5 bg-white shadow rounded-xl">
-        <Chart options={chartOptions[overViewSelected]} series={chartOptions[overViewSelected].series as any} type="line" height={350} />
+        <Chart options={chartOptions[overViewSelected]} series={chartOptions[overViewSelected].series as any} type="bar" height={350} />
       </div>
     </>
   );

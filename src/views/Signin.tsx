@@ -23,13 +23,13 @@ const Signin: React.FC = () => {
             const errors: FormikErrors<SigninModel> = {};
 
             if (!data.username) {
-                errors.username = "* Username cannot be empty";
+                errors.username = "* Email không được để trống";
             }
             if (!data.password) {
-                errors.password = "* Password cannot be empty";
+                errors.password = "* Mật khẩu không được để trống";
             }
             else if (data.password.length < 8) {
-                errors.password = "* Password cannot least than 8 characters";
+                errors.password = "* Mật khẩu phải có ít nhất 8 ký tự";
             }
             return errors;
         },
@@ -47,13 +47,13 @@ const Signin: React.FC = () => {
             .unwrap()
             .then((response:any) => {
                 if (!response.code || response.code !== 200) {
-                    failed("Invalid username or password!");
+                    failed("Tài khoản không hợp lệ !");
                 } else {
                     navigate("/");
                 }
             })
             .catch(() => {
-                failed("Invalid username or password!");
+                failed("Tài khoản không hợp lệ !");
             })
             .finally(() => {
                 setTimeout(() => {
@@ -91,8 +91,8 @@ const Signin: React.FC = () => {
                         <img src={logoImg} style={{ width: "100px", height: "100px" }} alt="Workflow"
                             className='text-xl font-bold text-gray-900 transition-all duration-300 origin-left scale-100 opacity-100 mb-4' />
                     </div>
-                    <h1 className="text-3xl font-bold text-left mb-2 text-center">Welcome back!</h1>
-                    <p className="text-black font-semibold text-left mb-8 text-center">Please enter your credentials to sign in!</p>
+                    <h1 className="text-3xl font-bold text-left mb-2 text-center">Chào mừng bạn</h1>
+                    <p className="text-black font-semibold text-left mb-8 text-center">Vui lòng nhập thông tin để đăng nhập</p>
                     <form onSubmit={formik.handleSubmit}>
                         <div className="space-y-6">
                             <div>
@@ -107,7 +107,7 @@ const Signin: React.FC = () => {
                                     onChange={formik.handleChange}
                                     onBlur={formik.handleBlur}
                                     className="w-full px-3 py-3 border-none rounded-xl focus:outline-none focus:bg-white focus:ring-2 focus:ring-[#2785ff] focus:border-transparent bg-[#F5F5F5]"
-                                    placeholder="Email"
+                                    placeholder="* nhập email"
                                 />
                                 {
                                     <div className="text-red-500 text-sm italic mt-2">
@@ -122,7 +122,7 @@ const Signin: React.FC = () => {
                             <div className='space-y-2'>
                                 <div>
                                     <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                                        Password
+                                        Mật khẩu
                                     </label>
                                     <div className="relative">
                                         <input
@@ -133,7 +133,7 @@ const Signin: React.FC = () => {
                                             onChange={formik.handleChange}
                                             onBlur={formik.handleBlur}
                                             className="w-full px-3 py-3 border-none rounded-xl focus:outline-none focus:bg-white focus:ring-2 focus:ring-[#2785ff] focus:border-transparent bg-[#F5F5F5]"
-                                            placeholder="Password"
+                                            placeholder="* nhập mật khẩu"
                                         />
                                         <button
                                             type="button"
@@ -160,7 +160,7 @@ const Signin: React.FC = () => {
                                 className="w-full bg-[#58dcc4] text-white font-semibold py-3 px-3 rounded-xl hover:bg-[#58dbb4] transition duration-200 justify-items-center"
                             >
                                 {signinState.status === 'loading' ? <Loader className={`animate-spin ${signinState.status === 'loading' ? 'text-white' : 'text-transparent'}`} />
-                                    : <span>Sign In</span>
+                                    : <span>Đăng nhập</span>
                                 }
                             </button>
                         </div>
