@@ -1,80 +1,28 @@
-import { RoleFunctionModel } from "./RoleFunction.model";
+// Role.model.ts
+import { Permission } from "./Permission.model";
 
+export class Role {
+  uniqueId: number;
+  roleName: string;
+  permissions: Permission[];
 
-class FunctionModel {
-  id: string;
-  actions: string[];
-  fields: {
-    select: string[];
-    update: string[];
-  };
-  functionCode: string;
-  functionName: string;
-  roleCode: string;
   constructor(
-    id: string,
-    actions: string[],
-    fields: {
-      select: string[];
-      update: string[];
-    },
-    functionCode: string,
-    functionName: string,
-    roleCode: string
+    uniqueId: number,
+    roleName: string,
+    permissions: Permission[] = []
   ) {
-    this.id = id;
-    this.actions = actions;
-    this.fields = fields;
-    this.functionCode = functionCode;
-    this.functionName = functionName;
-    this.roleCode = roleCode;
+    this.uniqueId = uniqueId;
+    this.roleName = roleName;
+    this.permissions = permissions;
   }
-  static initial() {
-    return {
-      id: "",
-      actions: [""],
-      fields: {
-        select: [],
-        update: [],
-      },
-      functionCode: "",
-      functionName: "",
-      roleCode: "",
-    };
+
+  getPermissionsDTO() {
+    if (!this.permissions) return null;
+    return this.permissions.map(permission => ({
+      uniqueId: permission.uniqueId,
+      groupName: permission.groupName,
+      groupPermission: permission.groupPermission,
+      activated: permission.activated
+    }));
   }
 }
-
-class RoleModel {
-  id: string;
-  code: string;
-  name: string;
-  functions: RoleFunctionModel[];
-  storeCodes?: string[];
-  status: string;
-  constructor(
-    id: string,
-    code: string,
-    name: string,
-    functions: RoleFunctionModel[],
-    status: string,
-    storeCodes?: string[]
-  ) {
-    this.id = id;
-    this.code = code;
-    this.name = name;
-    this.functions = functions;
-    this.status = status;
-    this.storeCodes = storeCodes;
-  }
-  static initial() {
-    return {
-      id: "",
-      code: "",
-      name: "",
-      functions: [],
-      status: "ACTIVE",
-      storeCodes: [],
-    };
-  }
-}
-export { RoleModel, FunctionModel };
