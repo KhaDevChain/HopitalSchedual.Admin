@@ -24,7 +24,7 @@ const EmployeeItem = ({ id }: { id?: any }) => {
                                 <Input className="bg-gray-100 h-12 rounded-xl border focus-visible:ring-blue-500 focus:border-blue-500" type="email" id="email" placeholder="Email" />
                             </div>
                             <div className="grid w-full items-center gap-1.5">
-                                <Label htmlFor="phone">Phone number</Label>
+                                <Label>Phone number</Label>
                                 <div className="flex flex-col lg:flex-row gap-4">
                                     <Select>
                                         <SelectTrigger className="h-12 lg:w-1/6 sm:w-full rounded-xl bg-gray-100 border focus-visible:ring-blue-500 focus:border-blue-500">

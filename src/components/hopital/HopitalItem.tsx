@@ -84,8 +84,8 @@ const HopitalItem = ({ id }: { id?: any }) => {
                         <div className="bg-white p-5 rounded-xl border border-gray-200">
                             <h4 className="font-bold text-xl mb-6">Tổng quan</h4>
                             <div className="flex flex-col lg:flex-row gap-4 w-auto mb-7">
-                                <StackedInput id="hopitalName" label="Tên bệnh viện" placeholder="* nhập tên bệnh viện" isRequired={true} />
                                 <StackedInput id="hopitalCode" label="Mã bệnh viện" placeholder="* nhập mã bệnh viện" isRequired={true} />
+                                <StackedInput id="hopitalName" label="Tên bệnh viện" placeholder="* nhập tên bệnh viện" isRequired={true} />
                             </div>
                             <div className="grid w-full items-center gap-1.5 mb-7">
                                 <Label htmlFor="hopitalAddress">Địa chỉ bệnh viện <span className="text-red-500">*</span></Label>
@@ -96,7 +96,7 @@ const HopitalItem = ({ id }: { id?: any }) => {
                                 <Input className="bg-gray-100 h-12 rounded-xl border focus-visible:ring-blue-500 focus:border-blue-500" type="email" id="hopitalEmail" placeholder="* nhập email" />
                             </div>
                             <div className="grid w-full items-center gap-1.5 mb-7">
-                                <Label htmlFor="phone">Loại bệnh viện <span className="text-red-500">*</span></Label>
+                                <Label>Loại bệnh viện <span className="text-red-500">*</span></Label>
                                 <div className="flex flex-col lg:flex-row gap-4">
                                     <Select>
                                         <SelectTrigger className="h-12 lg:w-1/6 sm:w-full rounded-xl bg-gray-100 border focus-visible:ring-blue-500 focus:border-blue-500 focus:bg-white">
@@ -274,7 +274,7 @@ const HopitalItem = ({ id }: { id?: any }) => {
                 <br /><br />
                 <div className="bg-white p-5 w-[calc(100%+64px)] bg-red-100 mx-[-32px] my-[-22px]">
                     <div className="flex items-center justify-between">
-                        <div className="flex items-center text-gray-600">
+                        <div className="flex items-center text-gray-600 ml-3">
                             <ArrowLeft className="p-1 me-1" />
                             <a href="/hopital/list" className="font-bold">Trở lại</a>
                         </div>

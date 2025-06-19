@@ -21,7 +21,7 @@ export const FragTableBody = ({ table, className }: { table: Table<any>, classNa
       ) : (
         <TableRow>
           <TableCell colSpan={table.getAllColumns().length} className="h-24 text-center">
-            No results.
+            Không có dữ liệu.
           </TableCell>
         </TableRow>
       )}

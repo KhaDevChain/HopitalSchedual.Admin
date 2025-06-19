@@ -3,7 +3,7 @@ import { ButtonOutline } from "../commons/ListButton";
 import { useState } from "react";
 import { Table } from "../ui/table";
 import { CloudDownload, Filter } from "lucide-react";
-import { downloadCSV } from "@/lib/export_csv";
+import { downloadCSV } from "@/utils/exportfile.util";
 import FragTableHeader from "../commons/TableHeader";
 import { FragTableBody } from "../commons/TableBody";
 import FragTableFooter from "../commons/TableFooter";

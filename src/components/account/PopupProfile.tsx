@@ -1,18 +1,12 @@
-import { useAppDispatch } from "@/app/hooks";
-import { AuthService } from "@/services/Auth.service";
-import { setLogined, setStoreCode } from "@/slice/app.slice";
+import AuthService from "@/services/Auth.service";
 import { LogOut, Settings, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const UserProfilePopup = () => {
-  const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    dispatch(setLogined(false));
-    dispatch(setStoreCode(""));
-    const authService = new AuthService();
-    authService.logout();
+    AuthService.logout();
     navigate('/signin');
   }
   return (
