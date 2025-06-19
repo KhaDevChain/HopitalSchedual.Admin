@@ -1,29 +1,24 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Eye, EyeOff, Loader } from 'lucide-react';
 import { FormikErrors, useFormik } from "formik";
 import logoImg from "../assets/logo/logo-main.png";
-import SigninModel from '@/models/signin/Signin.model';
-import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import { loginCall, setStatus } from '@/slice/signin.slice';
-import { LoginInfo } from '@/models/LoginInfo.model';
-import { setLogined, setUser } from '@/slice/app.slice';
-import { failed } from '@/utils/alert.util';
-import { useNavigate } from 'react-router-dom';
 import loading from "../assets/images/loading.gif";
+import { SigninRequest } from '@/models/dto/request/Signin.request';
+import { useNavigate } from 'react-router-dom';
+import AuthService from '@/services/Auth.service';
+import { failed } from '@/utils/alert.util';
 
 const Signin: React.FC = () => {
-    const dispatch = useAppDispatch();
-    const signinState = useAppSelector((state) => state.signin);
     const [showPassword, setShowPassword] = useState(false);
     const [stickyLoad, setStickyLoading] = useState(false);
     const navigate = useNavigate();
-    const formik = useFormik<SigninModel>({
-        initialValues: SigninModel.initial(),
+    const formik = useFormik<SigninRequest>({
+        initialValues: SigninRequest.initial(),
         validate: (data) => {
-            const errors: FormikErrors<SigninModel> = {};
+            const errors: FormikErrors<SigninRequest> = {};
 
-            if (!data.username) {
-                errors.username = "* Email không được để trống";
+            if (!data.email) {
+                errors.email = "* Email không được để trống";
             }
             if (!data.password) {
                 errors.password = "* Mật khẩu không được để trống";
@@ -34,59 +29,31 @@ const Signin: React.FC = () => {
             return errors;
         },
         onSubmit: async (data) => {
-            dispatch(loginCall(new LoginInfo(data.username, data.password, false)));
-            // FAMI: 26.03.2025 by Kha 
-            // Start loading
             setStickyLoading(true);
-          
-            // FAMI: 26.03.2025 by Kha 
-            // Call API to login
-            dispatch(
-                loginCall(new LoginInfo(data.username, data.password, false))
-            )
-            .unwrap()
-            .then((response:any) => {
-                if (!response.code || response.code !== 200) {
+
+            try {
+                const response = await AuthService.login(
+                    new SigninRequest(null, data.email, data.password)
+                );
+
+                if (!response || response.code != 200) {
                     failed("Tài khoản không hợp lệ !");
                 } else {
                     navigate("/");
                 }
-            })
-            .catch(() => {
+            } catch (error) {
                 failed("Tài khoản không hợp lệ !");
-            })
-            .finally(() => {
+            } finally {
                 setTimeout(() => {
                     setStickyLoading(false);
                 }, 1000);
-            });
+            }
         },
     });
-
-    useEffect(() => {
-        switch (signinState.status) {
-            case "completed":
-                if (signinState.authoried) {
-                    const localUser = localStorage.getItem('user');
-                    const user = JSON.parse(localUser ?? '{}');
-                    dispatch(setLogined(true));
-                    dispatch(setUser(user));
-                    window.location.replace('/');
-                }
-                break;
-            case "failed":
-                dispatch(setStatus("loading"));
-                dispatch(setStatus("failed"));
-                if (signinState.error !== 'Unauthorized') {
-                    failed(signinState.error || "");
-                }
-                break;
-        }
-    }, [signinState.status])
     return (
         <div className="max-h-screen flex p-[30px]">
             <div className="w-full flex items-center justify-center h-screen">
-                <div className="w-full max-w-sm mt-[-130px]">
+                <div className="w-full max-w-sm mt-[-100px]">
                     <div className="flex justify-center">
                         <img src={logoImg} style={{ width: "100px", height: "100px" }} alt="Workflow"
                             className='text-xl font-bold text-gray-900 transition-all duration-300 origin-left scale-100 opacity-100 mb-4' />
@@ -102,8 +69,8 @@ const Signin: React.FC = () => {
                                 <input
                                     type="text"
                                     id="email"
-                                    name="username"
-                                    value={formik.values.username}
+                                    name="email"
+                                    defaultValue={formik.values.email}
                                     onChange={formik.handleChange}
                                     onBlur={formik.handleBlur}
                                     className="w-full px-3 py-3 border-none rounded-xl focus:outline-none focus:bg-white focus:ring-2 focus:ring-[#2785ff] focus:border-transparent bg-[#F5F5F5]"
@@ -111,9 +78,9 @@ const Signin: React.FC = () => {
                                 />
                                 {
                                     <div className="text-red-500 text-sm italic mt-2">
-                                        {formik.touched.username && formik.errors.username && (
+                                        {formik.touched.email && formik.errors.email && (
                                             <div className="text-red-500 text-sm italic mt-2">
-                                                {formik.errors.username}
+                                                {formik.errors.email}
                                             </div>
                                         )}
                                     </div>
@@ -129,7 +96,7 @@ const Signin: React.FC = () => {
                                             type={showPassword ? 'text' : 'password'}
                                             id="password"
                                             name="password"
-                                            value={formik.values.password}
+                                            defaultValue={formik.values.password}
                                             onChange={formik.handleChange}
                                             onBlur={formik.handleBlur}
                                             className="w-full px-3 py-3 border-none rounded-xl focus:outline-none focus:bg-white focus:ring-2 focus:ring-[#2785ff] focus:border-transparent bg-[#F5F5F5]"
@@ -155,11 +122,11 @@ const Signin: React.FC = () => {
                                 </div>
                             </div>
                             <button
-                                disabled={signinState.status === 'loading'}
+                                disabled={stickyLoad}
                                 type="submit"
                                 className="w-full bg-[#58dcc4] text-white font-semibold py-3 px-3 rounded-xl hover:bg-[#58dbb4] transition duration-200 justify-items-center"
                             >
-                                {signinState.status === 'loading' ? <Loader className={`animate-spin ${signinState.status === 'loading' ? 'text-white' : 'text-transparent'}`} />
+                                {stickyLoad ? <Loader className={`animate-spin ${stickyLoad ? 'text-white' : 'text-transparent'}`} />
                                     : <span>Đăng nhập</span>
                                 }
                             </button>

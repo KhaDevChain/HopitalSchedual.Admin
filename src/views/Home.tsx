@@ -1,84 +1,76 @@
 import { FC, useState } from "react";
-import OrderModel from "@/models/dashboard/Order.model";
 import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
-import { ChevronsUpDown } from "lucide-react";
+import { ChevronsUpDown, PlusIcon } from "lucide-react";
 import DropDownDate from "@/components/home/SideLeft/DropDownDate";
 import ChartRevenue from "@/components/home/SideLeft/ChartRevenue";
 import CountrySale from "@/components/home/SideLeft/CountrySale";
-import { OrderList } from "@/components/home/Table/OrderList";
 import ProgressCircle from "@/components/home/SideRight/Circle";
+import { TaskNote } from "@/models/TaskNote.model";
+import { TaskNoteList } from "@/components/home/Table/TaskNoteList";
 
 const Home: FC = () => {
   const [selectedRange, setSelectedRange] = useState<string>("Annually");
   const [fromDate, setFromDate] = useState<string>("");
   const [toDate, setToDate] = useState<string>("");
-  const columns: ColumnDef<OrderModel>[] = [
+  const columns: ColumnDef<TaskNote>[] = [
     {
-      accessorKey: "id",
+      accessorKey: "uniqueId",
       header: () => (
         <div>
-          {"Order ID".toUpperCase()}
+          {"ID".toUpperCase()}
         </div>
       ),
-      cell: ({ row }) => <div className="text-gray-700">{row.getValue("id")}</div>,
+      cell: ({ row }) => <div className="text-gray-700">{row.getValue("uniqueId")}</div>,
     },
     {
-      accessorKey: "date",
+      accessorKey: "content",
       header: () => (
         <div>
-          {"Date".toUpperCase()}
+          {"Nội dung".toUpperCase()}
         </div>
       ),
-      cell: ({ row }) => <div className="text-gray-700">{row.getValue("date")}</div>,
+      cell: ({ row }) => <div className="text-gray-700">{row.getValue("content")}</div>,
     },
     {
-      accessorKey: "KioskCode",
+      accessorKey: "createdAt",
       header: ({ column }) => (
         <Button
           variant="ghost"
           type="button"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          {"Kiosk Code".toUpperCase()}
+          {"Ngày tạo".toUpperCase()}
           <ChevronsUpDown className="ml-2 h-4 w-4" />
         </Button>
       ),
-      cell: ({ row }) => <div className="text-gray-700 ml-2">kiosk_{row.index}</div>,
+      cell: ({ row }) => <div className="text-gray-700 ml-2">{row.getValue("createdAt")}</div>,
     },
     {
-      accessorKey: "city",
+      accessorKey: "status",
       header: ({ column }) => (
         <Button
           variant="ghost"
           type="button"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          {"City".toUpperCase()}
+          {"status".toUpperCase()}
           <ChevronsUpDown className="ml-2 h-4 w-4" />
         </Button>
       ),
-      cell: ({ row }) => <div className="text-gray-700 ml-2">{row.getValue("city")}</div>,
-    },
-    {
-      accessorKey: "transactions",
-      header: () => (
-        <div>
-          {"Total Transactions".toUpperCase()}
-        </div>
-      ),
-      cell: ({ row }) => <div className="text-gray-700">{row.getValue("transactions")} </div>,
+      cell: ({ row }) => <div className="text-gray-700 ml-2">{row.getValue("status")}</div>,
     },
   ];
   
   // data of table
-  const data = OrderModel.fakedata;
-  const filteredData = data.filter((order) => {
-    const orderDate = new Date(order.date).getTime();
-    const from = fromDate ? new Date(fromDate).getTime() : 0;
-    const to = toDate ? new Date(toDate).getTime() : Number.MAX_SAFE_INTEGER;
-    return orderDate >= from && orderDate <= to;
-  });
+  // const data = OrderModel.fakedata;
+  // const filteredData = data.filter((order) => {
+  //   const orderDate = new Date(order.date).getTime();
+  //   const from = fromDate ? new Date(fromDate).getTime() : 0;
+  //   const to = toDate ? new Date(toDate).getTime() : Number.MAX_SAFE_INTEGER;
+  //   return orderDate >= from && orderDate <= to;
+  // });
+  const filteredData:TaskNote[] = [];
   return (
     <>
       <div className="p-6 bg-gray-100 min-h-screen grid grid-cols-12 gap-6">
@@ -126,7 +118,7 @@ const Home: FC = () => {
       <div className="border p-5 bg-white rounded-2xl">
         <div className="flex flex-col gap-4">
         <div className="flex justify-between items-center pb-4">
-        <h3 className="text-lg font-semibold">Recent Orders</h3>
+        <h3 className="text-lg font-semibold">Công việc của bạn</h3>
           <div className="flex items-center space-x-3">
             <input
               type="date"
@@ -150,8 +142,14 @@ const Home: FC = () => {
                 className="border-none py-[8px] ps-[12px] pe-[34px] rounded-xl h-[47.99px] font-medium w-full bg-[#F5F5F5] focus:bg-white outline-blue-400"
               />
             </div>
+            <div className="relative">
+              <Button variant="outline" className="h-[47.99px] px-4 border-blue-500 text-blue-500 hover:bg-blue-50">
+                <span className="text-gray-600 font-bold">Thêm công việc</span>
+                <PlusIcon className="ml-2 h-4 w-4" />
+              </Button>
+            </div>
           </div>
-          <OrderList columns={columns} data={filteredData} />
+          <TaskNoteList columns={columns} data={filteredData} />
         </div>
       </div >
     </>

@@ -1,9 +1,15 @@
-import { Suspense, useEffect, useState } from 'react';
+import { createContext, Suspense, useContext, useEffect, useState } from 'react';
 import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
-import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import { setExpired, setRefreshToken } from "@/slice/app.slice";
-import { HttpService } from '@/services/http/HttpService';
+import { useNavigate } from 'react-router-dom';
+import AuthService from '@/services/Auth.service';
+import { Loader } from 'lucide-react';
+import { User } from '@/models/User.model';
+
+
+/**
+ * Page Root Layout
+ */
 type Props = {
     children: JSX.Element
     target: string
@@ -13,51 +19,90 @@ export const Layout = (props: Props) => {
     /**
      * Handle auto collapse menu sidebar
      */
-    const appState = useAppSelector(state => state.app);
-    const dispatch = useAppDispatch();
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
     const toggleSidebar = () => {
         setIsSidebarCollapsed(!isSidebarCollapsed);
     };
-    useEffect(() => {
-		if (!appState.logined) {
-			dispatch(setRefreshToken(undefined));
-			HttpService.setRefreshToken("");
-		}
-	}, [appState.logined]);
-	useEffect(() => {
-		if (appState.expired) {
-			dispatch(setExpired(false));
-		}
-	}, [appState.expired]);
 
     useEffect(() => {
-        // const handleResize = () => {
-        //     if (window.innerWidth < 768) {
-        //         setIsSidebarCollapsed(true);
-        //     } else {
-        //         setIsSidebarCollapsed(false);
-        //     }
-        // };
-        // handleResize();
-        // window.addEventListener("resize", handleResize);
-        // return () => window.removeEventListener("resize", handleResize);
         setIsSidebarCollapsed(true);
     }, []);
     return (
         <>
-            {/* {appState.logined ?
-                } */}
-                <div className="flex bg-gray-50">
-                    <Sidebar isCollapsed={isSidebarCollapsed} />
-                    <div className={`flex-1 flex flex-col ${isSidebarCollapsed ? 'ml-[72px]' : 'ml-[280px]'}`}>
-                        <Header onToggleSidebar={toggleSidebar} />
-                        <main className="flex-1 p-6 overflow-auto">
-                            <Suspense fallback={<></>}>{props.children}</Suspense>
-                        </main>
-                    </div>
-                </div> :
-                {/* <Navigate to={'/signin'} /> */}
+            <div className="flex bg-gray-50">
+                <Sidebar isCollapsed={isSidebarCollapsed} />
+                <div className={`flex-1 flex flex-col ${isSidebarCollapsed ? 'ml-[72px]' : 'ml-[280px]'}`}>
+                    <Header onToggleSidebar={toggleSidebar} />
+                    <main className="flex-1 p-6 overflow-auto">
+                        <Suspense fallback={<></>}>{props.children}</Suspense>
+                    </main>
+                </div>
+            </div> :
         </>
     )
 }
+
+
+/**
+ * Private Layout 
+ */
+interface PrivateLayoutProps {
+  children: React.ReactNode;
+}
+
+export const PrivateLayout: React.FC<PrivateLayoutProps> = ({ children }) => {
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const user = await AuthService.getCurrentUser();
+      console.log(user);
+      
+      if (user == null) {
+        navigate('/signin');
+      } else {
+        setIsAuthenticated(true);
+      }
+      setLoading(false);
+    };
+    checkAuth();
+  }, [navigate]);
+
+  if (loading) return <Loader className={`animate-spin`} />;
+
+  return isAuthenticated ? <>{children}</> : null;
+};
+
+
+/**
+ * Layout context for authentication
+ */
+interface AuthContextType {
+  user: User | null;
+  setUser: React.Dispatch<React.SetStateAction<User | null>>;
+}
+
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    AuthService.getCurrentUser().then(setUser).catch(() => setUser(null));
+  }, []);
+
+  return (
+    <AuthContext.Provider value={{ user, setUser }}>
+      {children}
+    </AuthContext.Provider>
+  );
+};
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) throw new Error("useAuth must be used within AuthProvider");
+  return context;
+};
+
