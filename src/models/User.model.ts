@@ -10,6 +10,7 @@ export class User {
   phone: string;
   password: string;
   email: string;
+  fullName?: string;
   createdAt: string; // ISO date string
   activated: ActivateEnum;
   role: Role;
@@ -21,6 +22,7 @@ export class User {
     phone: string,
     password: string,
     email: string,
+    fullName: string,
     activated: ActivateEnum,
     role: Role,
     taskNotes: TaskNote[] = [],
@@ -31,6 +33,7 @@ export class User {
     this.phone = phone;
     this.password = password;
     this.email = email;
+    this.fullName = fullName;
     this.activated = activated;
     this.role = role;
     this.taskNotes = taskNotes;

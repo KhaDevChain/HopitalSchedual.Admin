@@ -1,152 +1,87 @@
+// src/App.tsx
 import React, { Suspense } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import { Layout } from './views/Layout';
-import RoleAndPermission from './views/RoleAndPermission';
-import ClientDetails from './components/people/PeopleDetails';
-import ProductItem from './components/product/ProductItem';
-import Home from './views/Home';
-import PeopleItem from './components/people/PeopleItem';
-import ContractList from './components/people/ContractList';
-import Hopital from './views/Hopital';
-import HopitalItem from './components/hopital/HopitalItem';
-import HopitalContractList from './components/hopital/_HopitalContractList';
+import { Layout, PrivateLayout } from './views/Layout';
+import { Loader } from 'lucide-react';
 
+// Pages
 const SignIn = React.lazy(() => import('./views/Signin'));
-// customer
+const Home = React.lazy(() => import('./views/Home'));
 const People = React.lazy(() => import('./views/People'));
-// product
+const PeopleItem = React.lazy(() => import('./components/people/PeopleItem'));
+const ContractList = React.lazy(() => import('./components/people/ContractList'));
+const Hopital = React.lazy(() => import('./views/Hopital'));
+const HopitalItem = React.lazy(() => import('./components/hopital/HopitalItem'));
+const HopitalContractList = React.lazy(() => import('./components/hopital/_HopitalContractList'));
+const ClientDetails = React.lazy(() => import('./components/people/PeopleDetails'));
 const Product = React.lazy(() => import('./views/Product'));
-const ProuctItem = React.lazy(() => import('./components/product/ProductItem'));
-// order
+const ProductItem = React.lazy(() => import('./components/product/ProductItem'));
 const Order = React.lazy(() => import('./views/Order'));
 const OrderItem = React.lazy(() => import('./components/order/OrderItem'));
-
-// file manager
-// employee
+const RoleAndPermission = React.lazy(() => import('./views/RoleAndPermission'));
 const Employee = React.lazy(() => import('./views/Employee'));
 const EmployeeItem = React.lazy(() => import('./components/employee/EmployeeItem'));
 const EmployeeDetails = React.lazy(() => import('./components/employee/EmployeeDetails'));
 const EmployeeCheck = React.lazy(() => import('./views/CheckinCheckout'));
 
-const pageList = [
-  {
-    path: "/*",
-    element: <Layout children={<Home />} target={'/'}></Layout>
-  },
-  {
-    path: "/signin",
-    element: <Suspense fallback={<></>}><SignIn /></Suspense>
-  },
-  // People & Contact
-  {
-    path: "/peoples/contact",
-    element: <Layout children={<People />} target={'/peoples/contact'}></Layout>
-  },
-  {
-    path: "/peoples/contact-edit",
-    element: <Layout children={<PeopleItem />} target={'/peoples/contact-edit'}></Layout>
-  },
-  {
-    path: "/peoples/contact-create",
-    element: <Layout children={<PeopleItem />} target={'/peoples/contact-create'}></Layout>
-  },
-  {
-    path: "/peoples/contract",
-    element: <Layout children={<ContractList />} target={'/peoples/contract'}></Layout>
-  },
-    // Hopital
-  {
-    path: "/hopital/list",
-    element: <Layout children={<Hopital />} target={'/hopital/list'}></Layout>
-  },
-  {
-    path: "/hopital/contact-edit",
-    element: <Layout children={<HopitalItem />} target={'/hopital/contact-edit'}></Layout>
-  },
-  {
-    path: "/hopital/contact-create",
-    element: <Layout children={<HopitalItem />} target={'/hopital/contact-create'}></Layout>
-  },
-   {
-    path: "/hopital/contract",
-    element: <Layout children={<HopitalContractList />} target={'/hopital/contract'}></Layout>
-  },
-  {
-    path: "/clients/client-details",
-    element: <Layout children={<ClientDetails />} target={'/client-details'}></Layout>
-  },
-  // Device
-  {
-    path: "/devices/device-list",
-    element: <Layout children={<Product />} target={'/device-list'}></Layout>
-  },
-  {
-    path: "/devices/device-details/:id",
-    element: <Layout children={<ProductItem />} target={'/device-details/:id'}></Layout>
-  },
-  // product
-  {
-    path: "/products/product-list",
-    element: <Layout children={<Product />} target={'/product-list'}></Layout>
-  },
-  {
-    path: "/products/product-edit/:id",
-    element: <Layout children={<ProuctItem />} target={'/product-edit/:id'}></Layout>
-  },
-  {
-    path: "/products/product-create",
-    element: <Layout children={<ProuctItem />} target={'/product-create'}></Layout>
-  },
-  // order/ transaction
-  {
-    path: "/transactions/transaction-list",
-    element: <Layout children={<Order />} target={'/order-list'}></Layout>
-  },
-  {
-    path: "/transactions/transaction-edit/:id",
-    element: <Layout children={<OrderItem id={''} />} target={'/order-edit/:id'}></Layout>
-  },
-  // permission
-  {
-    path: "/permission",
-    element: <Layout children={<RoleAndPermission />} target={'/'}></Layout>
-  },
-  // employee
-  {
-    path: "/employees/employee-list",
-    element: <Layout children={<Employee />} target={'/empoyee'}></Layout>
-  },
-  {
-    path: "/employees/employee-edit/1",
-    element: <Layout children={<EmployeeItem id={1} />} target={'/empoyee-details/:id'}></Layout>
-  },
-  {
-    path: "/employees/employee-create",
-    element: <Layout children={<EmployeeItem />} target={'/empoyee-create'}></Layout>
-  },
-  {
-    path: "/employees/employee-details/1",
-    element: <Layout children={<EmployeeDetails />} target={'/empoyee-details/:id'}></Layout>
-  },
-  {
-    path: "/employees/checkin",
-    element: <Layout children={<EmployeeCheck />} target={'/empoyee'}></Layout>
-  }
-]
-
+// Define private routes
+const privateRoutes = [
+  { path: '/*', element: <Home /> },
+  { path: '/peoples/contact', element: <People /> },
+  { path: '/peoples/contact-edit', element: <PeopleItem /> },
+  { path: '/peoples/contact-create', element: <PeopleItem /> },
+  { path: '/peoples/contract', element: <ContractList /> },
+  { path: '/hopital/list', element: <Hopital /> },
+  { path: '/hopital/contact-edit', element: <HopitalItem /> },
+  { path: '/hopital/contact-create', element: <HopitalItem /> },
+  { path: '/hopital/contract', element: <HopitalContractList /> },
+  { path: '/clients/client-details', element: <ClientDetails /> },
+  { path: '/devices/device-list', element: <Product /> },
+  { path: '/devices/device-details/:id', element: <ProductItem /> },
+  { path: '/products/product-list', element: <Product /> },
+  { path: '/products/product-edit/:id', element: <ProductItem /> },
+  { path: '/products/product-create', element: <ProductItem /> },
+  { path: '/transactions/transaction-list', element: <Order /> },
+  { path: '/transactions/transaction-edit/:id', element: <OrderItem id={''} /> },
+  { path: '/permission', element: <RoleAndPermission /> },
+  { path: '/employees/employee-list', element: <Employee /> },
+  { path: '/employees/employee-edit/1', element: <EmployeeItem id={1} /> },
+  { path: '/employees/employee-create', element: <EmployeeItem /> },
+  { path: '/employees/employee-details/1', element: <EmployeeDetails /> },
+  { path: '/employees/checkin', element: <EmployeeCheck /> },
+];
 
 const App = () => {
   return (
     <BrowserRouter>
-      <div className='App'>
+      <div className="App">
         <Routes>
-          {pageList.map(page => (
-            <Route key={page.path} path={page.path} element={page.element} />
+          {/* Public route */}
+          <Route
+            path="/signin"
+            element={
+              <Suspense fallback={<Loader className={`animate-spin`} />}>
+                <SignIn />
+              </Suspense>
+            }
+          />
+
+          {/* Private routes */}
+          {privateRoutes.map(({ path, element }) => (
+            <Route
+              key={path}
+              path={path}
+              element={
+                <PrivateLayout>
+                  <Layout children={<Suspense fallback={<Loader className={`animate-spin`} />}>{element}</Suspense>} target={path} />
+                </PrivateLayout>
+              }
+            />
           ))}
         </Routes>
       </div>
     </BrowserRouter>
-  )
-}
+  );
+};
 
-export default App
+export default App;

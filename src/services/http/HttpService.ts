@@ -1,154 +1,50 @@
-import axios, { AxiosResponse } from "axios";
+import { Global } from "@/Global";
+import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
+
+const config = Global();
 
 class HttpService {
-  static instance = axios.create({
-    baseURL: import.meta.env.VITE_APP_baseApiURL,
-    timeout: 180000,
+
+  // Tạo một instance của axios với cấu hình mặc định
+  private static instance: AxiosInstance = axios.create({
+    baseURL: config.apiUrl || '',
+    timeout: 15000,
     headers: {
-      "Content-Type": "application/json;charset=utf-8",
-      Accept: "application/json",
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
     },
+    withCredentials: true
   });
-  static isRefreshing = false;
-  static refreshMethod: Promise<AxiosResponse<any, any>>;
-  static commonParams() {
-    return {
-      // create_user: localStorage.getItem("userId"),
-      // update_user: localStorage.getItem("userId"),
+
+  static async get<T = any>(url: string, params?: object, headers?: object): Promise<AxiosResponse<T>> {
+    const config: AxiosRequestConfig = {
+      params,
+      headers,
     };
+    return this.instance.get(url, config);
   }
-  static getLocalToken() {
-    return localStorage.getItem("accessToken");
-  }
-  static getLocalRefreshToken() {
-    return localStorage.getItem("refreshToken");
-  }
-  static getUsername() {
-    return localStorage.getItem("username");
-  }
-  static setToken(token: string) {
-    HttpService.instance.defaults.headers["Authorization"] = `Bearer ${token}`;
-    localStorage.setItem("accessToken", token);
-  }
-  static setRefreshToken(token: string) {
-		localStorage.setItem(import.meta.env.VITE_APP_storageRefreshTokenKey!, token);
-	}
-  static setLocalRefToken(token: string) {
-    localStorage.setItem("refreshToken", token);
-  }
-  static initialize() {
-    const token = HttpService.getLocalToken();
-    // console.log("token", token);
-    if (token) {
-      HttpService.setToken(token);
-    }
-    HttpService.instance.interceptors.request.use((request) => {
-      // console.log("CALL API", JSON.stringify(request));
-      return request;
-    });
-    const refreshToken = () => {
-      if (HttpService.isRefreshing) {
-        return HttpService.refreshMethod;
-      }
-      //console.log('get new token using refresh token', HttpService.getLocalRefreshToken())
-      HttpService.isRefreshing = true;
-      HttpService.refreshMethod = this.doPostRequest(
-        "/auth/refresh",
-        {
-          username: this.getUsername(),
-          refreshToken: this.getLocalRefreshToken(),
-        },
-        false
-      );
-      return HttpService.refreshMethod;
+
+  static async post<T = any>(url: string, data?: object, headers?: object): Promise<AxiosResponse<T>> {
+    const config: AxiosRequestConfig = {
+      headers,
     };
-    HttpService.instance.interceptors.response.use(
-      (response) => {
-        // console.log(response);
-        return response;
-      },
-      async (error) => {
-        // console.log("http error.response", error.response);
-        const { data } = error.response;
-        if (
-          data.message === "Invalid access token!" &&
-          data.error !== "Invalid refresh token!"
-        ) {
-          try {
-            console.log("call Refresh");
-            const rs = await refreshToken();
-            if (rs.status === 200) {
-              const { accessToken } = rs.data.data;
-              if (HttpService.isRefreshing) {
-                HttpService.setToken(accessToken);
-                HttpService.isRefreshing = false;
-              }
-              const config = error.config;
-              config.headers["Authorization"] = `Bearer ${accessToken}`;
-              return await HttpService.instance.request(config);
-            } else {
-              return Promise.reject(rs);
-            }
-          } catch (error) {
-            return Promise.reject(error);
-          }
-        } else {
-          //const response = error.response ? error.response.data : error
-          return Promise.reject(error);
-        }
-      }
-    );
+    return this.instance.post(url, data, config);
   }
-  static async doPrintRequest(url: string, data: any) {
-    const requestOptions = {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded;charset=utf-8",
-      },
-      body: JSON.stringify(data),
+
+  static async put<T = any>(url: string, data?: object, headers?: object): Promise<AxiosResponse<T>> {
+    const config: AxiosRequestConfig = {
+      headers,
     };
-    const response = await fetch(url, requestOptions);
-    const result = await response.json();
-    //const params={...Object(data)}
-    //const response= HttpService.instance.post(url, params)
-    return result;
-  }
-  static async doUploadRequest(url: string, data: any) {
-    delete HttpService.instance.defaults.headers["Content-Type"];
-    delete HttpService.instance.defaults.headers["Accept"];
-    return HttpService.instance.post(url, data, {
-      headers: { "Content-Type": "multipart/form-data", Accept: "*/*" },
-    });
-  }
-  static async doPostRequest(url: string, data: any, withAccessToken = true) {
-    if (!withAccessToken) {
-      delete HttpService.instance.defaults.headers["Authorization"];
-      return HttpService.instance.post(url, data);
-    } else {
-      const params = { ...Object(data), ...this.commonParams() };
-      const response = HttpService.instance.post(url, params);
-      return response;
-    }
+    return this.instance.put(url, data, config);
   }
 
-  static async doGetRequest(url: string, data: any) {
-    const params = { ...Object(data), ...this.commonParams() };
-    return HttpService.instance.get(url, { params: params });
-  }
-
-  static async doPatchRequest(url: string, data: any) {
-    const params = { ...Object(data), ...this.commonParams() };
-    return HttpService.instance.patch(`${url}`, params);
-  }
-
-  static async doPutRequest(url: string, data: any) {
-    const params = { ...Object(data), ...this.commonParams() };
-    return HttpService.instance.put(url, params);
-  }
-
-  static async doDeleteRequest(url: string, data: any) {
-    const params = { ...Object(data), ...this.commonParams() };
-    return HttpService.instance.delete(`${url}`, { data: params });
+  static async delete<T = any>(url: string, data?: object, headers?: object): Promise<AxiosResponse<T>> {
+    const config: AxiosRequestConfig = {
+      data,
+      headers,
+    };
+    return this.instance.delete(url, config);
   }
 }
+
 export { HttpService };

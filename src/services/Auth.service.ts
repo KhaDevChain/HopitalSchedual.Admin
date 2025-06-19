@@ -1,85 +1,91 @@
-
-import { LoginInfo } from "@/models/LoginInfo.model";
+import { SigninRequest } from "@/models/dto/request/Signin.request";
 import { HttpService } from "./http/HttpService";
-import { parseCommonHttpResult } from "./http/parseCommonHttpResult";
+import { SigninResponse } from "@/models/dto/response/Signin.response";
+import axios from "axios";
+import { User } from "@/models/User.model";
+import { Role } from "@/models/Role.model";
+import { TaskNote } from "@/models/TaskNote.model";
+import { UserRecord } from "@/models/UserRecord.model";
+import { ActivateEnum } from "@/types/enum/action.enum";
 
-interface Authen {
-  authenticate(args: LoginInfo): any;
-}
-class LocalAuthen implements Authen {
-  async authenticate(arg: LoginInfo) {
-    const response = await HttpService.doPostRequest(
-      "/auth/login",
-      {
-        username: arg.username,
-        password: arg.password,
-      },
-      false
-    );
-    if (response.status == 200) {
-      const data = response.data.data;
-      localStorage.setItem("username", arg.username);
-      if (arg.remember) {
-        localStorage.setItem("remember_username", arg.username);
-        localStorage.setItem("remember_password", arg.password);
-      } else {
-        localStorage.removeItem("remember_username");
-        localStorage.removeItem("remember_password");
-      }
-      localStorage.setItem("accessToken", data.tokens.access);
-      HttpService.setToken(data.tokens.access);
-      localStorage.setItem("refreshToken", data.tokens.refresh);
-      HttpService.setLocalRefToken(data.tokens.refresh);
-      localStorage.setItem("role", JSON.stringify(data.role));
-      localStorage.setItem("typeAccess", data.typeAccess);
-      localStorage.setItem("userId", data.profile.userId);
-      localStorage.setItem("user", JSON.stringify(data.profile));
-      localStorage.setItem("myStore", JSON.stringify(data.profile.stores));
-      return data.profile;
-    }
-    return { code: response.status, message: response.statusText };
-  }
-}
-class AuthenManager {
-  executeAuthenticate(arg: LoginInfo) {
-    if (arg instanceof LoginInfo) {
-      return new LocalAuthen().authenticate(arg);
-    }
-  }
-}
-class AuthenEventHandler {
-  constructor(public authenManager: AuthenManager) {}
-  handleAuthen(arg: LoginInfo) {
-    return this.authenManager.executeAuthenticate(arg);
-  }
-}
+// Service để đăng nhập
 class AuthService {
-  login(arg: LoginInfo, authenManager: AuthenManager) {
-    const authenHandler = new AuthenEventHandler(authenManager);
-    return authenHandler.handleAuthen(arg);
+
+  static async login(payload: SigninRequest): Promise<SigninResponse> {
+    try {
+      const res = await HttpService.post("/auth/login", payload, {
+        withCredentials: true
+      });
+      return new SigninResponse(res.data?.accessToken, res.data?.user, res.status, "Đăng nhập thành công");
+    } catch (error: unknown) {
+      return AuthService.handleError(error, "Đăng nhập thất bại");
+    }
   }
-  logout() {
-    localStorage.removeItem("user");
-    localStorage.removeItem("username");
-    localStorage.removeItem("accessToken");
-    HttpService.setToken("");
-    localStorage.removeItem("refreshToken");
-    HttpService.setLocalRefToken("");
-    localStorage.removeItem("userId");
-    localStorage.removeItem("user");
+
+  static async getCurrentUser(): Promise<User|null> {
+    try {
+      const res = await HttpService.post("/user/me", {});
+      const data = res.data;
+
+      const role = new Role(
+        data.role.uniqueId,
+        data.role.roleName,
+        data.role.permissions
+      );
+
+      const taskNotes = (data.taskNotes || []).map(
+        (note: any) =>
+          new TaskNote(
+            note.uniqueId,
+            note.title,
+            note.description,
+            note.createdAt
+          )
+      );
+
+      const userRecord = data.userRecord
+        ? new UserRecord(
+            data.userRecord.uniqueId,
+            data.userRecord.history,
+            data.userRecord.modifiedAt
+          )
+        : undefined;
+
+      return new User(
+        data.uniqueId,
+        data.phone,
+        data.password,
+        data.email,
+        data.fullName,
+        data.activated as ActivateEnum,
+        role,
+        taskNotes,
+        userRecord,
+        data.createdAt ?? new Date().toISOString()
+      );
+    } catch (error: unknown) {
+      return null;
+    }
   }
-  getCurrentUser() {
-    const userStr = localStorage.getItem("user");
-    if (userStr) return JSON.parse(userStr);
-    return null;
+
+  static async logout() {
+    try {
+      const res = await HttpService.post("/auth/logout", {});
+      return new SigninResponse(res.data?.accessToken, res.data?.user, res.status, "Đăng xuất thành công");
+    } catch (error: unknown) {
+      return AuthService.handleError(error, "Lỗi đăng xuất");
+    }
   }
-  async changePassword(data: any) {
-    const res = await HttpService.doPatchRequest(`/auth/password/change`, data);
-    return parseCommonHttpResult(res);
-  }
-  async resetPassword(data: any) {
-    const res = await HttpService.doPatchRequest(`/auth/password/reset`, data);
-    return parseCommonHttpResult(res);
+
+  // Lỗi phát sinh
+  private static handleError(error: unknown, defaultMsg: string): SigninResponse {
+    if (axios.isAxiosError(error)) {
+      const status = error.response?.status || 500;
+      const message = error.response?.data?.message || defaultMsg;
+      return new SigninResponse(null, null, status, message);
+    }
+    return new SigninResponse(null, null, 500, defaultMsg);
   }
 }
-export { AuthService, AuthenManager, LocalAuthen, AuthenEventHandler };
+
+export default AuthService;
