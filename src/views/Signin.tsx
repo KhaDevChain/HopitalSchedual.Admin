@@ -3,19 +3,21 @@ import { Eye, EyeOff, Loader } from 'lucide-react';
 import { FormikErrors, useFormik } from "formik";
 import logoImg from "../assets/logo/logo-main.png";
 import loading from "../assets/images/loading.gif";
-import { SigninRequest } from '@/models/dto/request/Signin.request';
+import { LoginRequest } from '@/models/dto/request/Login.request';
 import { useNavigate } from 'react-router-dom';
 import AuthService from '@/services/Auth.service';
 import { failed } from '@/utils/alert.util';
+import { useAuth } from './Layout';
 
 const Signin: React.FC = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [stickyLoad, setStickyLoading] = useState(false);
+    const { setUser } = useAuth();
     const navigate = useNavigate();
-    const formik = useFormik<SigninRequest>({
-        initialValues: SigninRequest.initial(),
+    const formik = useFormik<LoginRequest>({
+        initialValues: LoginRequest.initial(),
         validate: (data) => {
-            const errors: FormikErrors<SigninRequest> = {};
+            const errors: FormikErrors<LoginRequest> = {};
 
             if (!data.email) {
                 errors.email = "* Email không được để trống";
@@ -33,12 +35,13 @@ const Signin: React.FC = () => {
 
             try {
                 const response = await AuthService.login(
-                    new SigninRequest(null, data.email, data.password)
+                    new LoginRequest(null, data.email, data.password)
                 );
 
                 if (!response || response.code != 200) {
                     failed("Tài khoản không hợp lệ !");
                 } else {
+                    setUser(response.user);
                     navigate("/");
                 }
             } catch (error) {

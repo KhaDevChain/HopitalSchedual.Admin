@@ -61,7 +61,14 @@ export const PrivateLayout: React.FC<PrivateLayoutProps> = ({ children }) => {
         const user = await AuthService.getCurrentUser();
       
         if (user == null) {
-          navigate('/signin');
+          const newAccessToken = await AuthService.refreshToken();
+          if (newAccessToken.code === 200) {
+            const refreshedUser = await AuthService.getCurrentUser();
+            setIsAuthenticated(refreshedUser !== null);
+          } else {
+            setIsAuthenticated(false);
+            navigate('/signin');
+          }
         } else {
           setIsAuthenticated(true);
         }

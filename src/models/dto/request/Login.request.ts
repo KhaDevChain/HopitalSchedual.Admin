@@ -1,10 +1,10 @@
-export class SigninRequest {
+export class LoginRequest {
 	constructor(public phone: null, public email: string, public password: string) {
 		this.phone = phone;
 		this.email = email;
 		this.password = password;
 	}
-	static initial(): SigninRequest {
+	static initial(): LoginRequest {
 		return {
 			phone: null,
 			email: "",
@@ -12,7 +12,7 @@ export class SigninRequest {
 		};
 	}
 	static fromJson(json: any) {
-		return new SigninRequest(
+		return new LoginRequest(
 			null,
 			json?.email,
 			json?.password
