@@ -25,15 +25,17 @@ class AuthService {
   static async getCurrentUser(): Promise<User|null> {
     try {
       const res = await HttpService.post("/user/me", {});
-      const data = res.data;
+      
+      const json = res.data;
+      const user = json.data;
 
       const role = new Role(
-        data.role.uniqueId,
-        data.role.roleName,
-        data.role.permissions
+        user.roleDto.uniqueId,
+        user.roleDto.roleName,
+        user.roleDto.permissions
       );
 
-      const taskNotes = (data.taskNotes || []).map(
+      const taskNotes = (user.taskNotes || []).map(
         (note: any) =>
           new TaskNote(
             note.uniqueId,
@@ -43,25 +45,25 @@ class AuthService {
           )
       );
 
-      const userRecord = data.userRecord
+      const userRecord = user.userRecord
         ? new UserRecord(
-            data.userRecord.uniqueId,
-            data.userRecord.history,
-            data.userRecord.modifiedAt
+            user.userRecord.uniqueId,
+            user.userRecord.history,
+            user.userRecord.modifiedAt
           )
         : undefined;
 
       return new User(
-        data.uniqueId,
-        data.phone,
-        data.password,
-        data.email,
-        data.fullName,
-        data.activated as ActivateEnum,
+        user.uniqueId,
+        user.phone,
+        user.password,
+        user.email,
+        user.fullName,
+        user.activated as ActivateEnum,
         role,
         taskNotes,
         userRecord,
-        data.createdAt ?? new Date().toISOString()
+        user.createdAt ?? new Date().toISOString()
       );
     } catch (error: unknown) {
       return null;

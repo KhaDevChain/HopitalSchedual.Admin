@@ -57,15 +57,20 @@ export const PrivateLayout: React.FC<PrivateLayoutProps> = ({ children }) => {
 
   useEffect(() => {
     const checkAuth = async () => {
-      const user = await AuthService.getCurrentUser();
-      console.log(user);
+      try {
+        const user = await AuthService.getCurrentUser();
       
-      if (user == null) {
-        navigate('/signin');
-      } else {
-        setIsAuthenticated(true);
+        if (user == null) {
+          navigate('/signin');
+        } else {
+          setIsAuthenticated(true);
+        }
+      } catch (error) {
+        setIsAuthenticated(false);
       }
-      setLoading(false);
+      finally {
+        setLoading(false);
+      }
     };
     checkAuth();
   }, [navigate]);
