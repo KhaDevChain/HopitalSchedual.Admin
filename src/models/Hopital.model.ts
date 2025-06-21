@@ -4,7 +4,7 @@ import { ActivateEnum } from "@/types/enum/action.enum";
 import { HopitalTypeEnum } from "@/types/enum/hopitaltype.enum";
 import { Doctor } from "./Doctor.model";
 
-export class Hopital {
+export class HopitalModel {
   uniqueId: string;
   name: string;
   code: string;

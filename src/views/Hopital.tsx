@@ -1,15 +1,28 @@
-import CustomerModel from "@/models/Customer.model";
 import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "../components/ui/button";
 import { ChevronsUpDown, Eye, Pen } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox"
 import { Link } from "react-router-dom";
-import ClientModel from "@/models/client/Client.model";
 import { HopitalTable } from "@/components/hopital/HopitalList";
+import { HopitalModel } from "@/models/Hopital.model";
+import { ActivateEnum } from "@/types/enum/action.enum";
+import { useEffect, useState } from "react";
+import HopitalService from "@/services/Hopital.service";
 
 function Hopital() {
+    const [listHopital, setHospitals] = useState<HopitalModel[]>([]);
+
+    useEffect(() => {
+        const fetchHospitals = async () => {
+        const response = await HopitalService.getAll();
+            setHospitals(response); // Cập nhật state
+        };
+
+        fetchHospitals();
+    }, []);
+
     //header of table
-    const columns: ColumnDef<CustomerModel>[] = [
+    const columns: ColumnDef<HopitalModel>[] = [
         {
             id: "select",
             accessorKey: "checkbox",
@@ -35,7 +48,21 @@ function Hopital() {
                 <Button
                     variant={"ghost"}
                     type="button"
-                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>{"Name".toUpperCase()}
+                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>{"Tên Bệnh viện"}
+                    <ChevronsUpDown className="ml-2 h-4 w-4" />
+                </Button>),
+            cell: ({ row }) => <div className="flex items-center">
+                <img src="https://ecme-react.themenate.net/img/avatars/thumb-1.jpg" alt="Profile" className="w-10 h-10 rounded-full" />
+                <a className="ml-2 font-bold">{row.original.name}</a>
+            </div>,
+        },
+        {
+            accessorKey: "code",
+            header: ({ column }) => (
+                <Button
+                    variant={"ghost"}
+                    type="button"
+                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>{"Mã Bệnh viện"}
                     <ChevronsUpDown className="ml-2 h-4 w-4" />
                 </Button>),
             cell: ({ row }) => <div className="flex items-center">
@@ -49,26 +76,26 @@ function Hopital() {
                 return (<Button
                     type="button"
                     variant="ghost"
-                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>{"Email".toUpperCase()}
+                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>{"Email"}
                     <ChevronsUpDown className="ml-2 h-4 w-4" />
                 </Button>);
             },
         },
         {
             accessorKey: "location",
-            header: "Location".toUpperCase(),
+            header: "Địa chỉ",
         },
         {
             accessorKey: "status",
             header: ({ column }) => (
                 <Button
                     type="button" variant={"ghost"}
-                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>{"Status".toUpperCase()}
+                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>{"Trạng thái"}
                     <ChevronsUpDown className="ml-2 h-4 w-4" />
                 </Button>
             ),
             cell: ({ row }) => {
-                return row.original.status === true ?
+                return row.original.activated === ActivateEnum.ACTIVE ?
                     (<div className="bg-emerald-200 w-fit py-[4px] px-[10px] rounded-lg font-bold mx-4">
                         <span>Active</span>
                     </div>) :
@@ -93,10 +120,9 @@ function Hopital() {
         },
     ];
     // data of table
-    const data = ClientModel.fakedata;
     return (
         <div className="mx-auto px-2">
-            <HopitalTable columns={columns} data={data} />
+            <HopitalTable columns={columns} data={listHopital} />
         </div>
     )
 }

@@ -65,7 +65,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
                     setIsOpenNotify(false);
                 }}>
                     <img
-                        src="https://ecme-react.themenate.net/img/avatars/thumb-1.jpg"
+                        src="https://cdn-icons-png.flaticon.com/512/8345/8345328.png"
                         alt="Profile"
                         className="w-8 h-8 rounded-full"
                     />

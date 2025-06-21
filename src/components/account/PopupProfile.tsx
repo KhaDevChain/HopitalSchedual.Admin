@@ -16,7 +16,7 @@ const UserProfilePopup = () => {
       <div className="absolute right-0 mt-2 w-60 bg-white rounded-2xl shadow-[0px_20px_30px_#A6AEBF] p-4 w-[max-content]">
         <div className="flex items-center gap-3 border-b pb-3">
           <img
-            src="https://ecme-react.themenate.net/img/avatars/thumb-1.jpg"
+            src="https://cdn-icons-png.flaticon.com/512/8345/8345328.png"
             alt="User Avatar"
             className="w-12 h-12 rounded-full"
           />
@@ -36,12 +36,12 @@ const UserProfilePopup = () => {
           </li>
         </ul>
         <div className="border-t mt-3 pt-3">
-          <button
+          <span
             onClick={handleLogout}
             className="w-full flex items-center gap-2 text-red-500 hover:bg-red-100 text-md p-2 rounded-md">
             <LogOut />
             Đăng xuất
-          </button>
+          </span>
         </div>
       </div>
     </div>
