@@ -33,12 +33,12 @@ const failed = (text: string) => {
 		});
 	}
 };
-const completed = () => {
+const completed = (content: string) => {
 	Swal.fire({
 		icon: "success",
 		showConfirmButton: false,
 		title: t("success"),
-		text: "",
+		text: content || "Thành công!",
 		timer: 2000,
 	});
 };

@@ -18,6 +18,7 @@ export class HopitalModel {
   logo: string;
   contract?: string;
   representName?: string;
+  representPhone?: string;
   representJob?: string;
   activated: ActivateEnum;
   createdAt?: string;
@@ -37,6 +38,7 @@ export class HopitalModel {
     logo: string,
     contract: string,
     representName: string,
+    representPhone: string,
     representJob: string,
     activated: ActivateEnum,
     createdAt: string,
@@ -55,6 +57,7 @@ export class HopitalModel {
     this.logo = logo;
     this.contract = contract;
     this.representName = representName;
+    this.representPhone = representPhone;
     this.representJob = representJob;
     this.activated = activated;
     this.createdAt = createdAt;

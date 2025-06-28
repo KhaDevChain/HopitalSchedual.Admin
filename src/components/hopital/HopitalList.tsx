@@ -10,7 +10,7 @@ import {
 } from "@tanstack/react-table"
 import { Table } from "@/components/ui/table"
 import React, { useState } from "react";
-import { CloudDownload, CloudUpload, Filter, UserRoundPlus } from "lucide-react";
+import { CloudDownload, CloudUpload, Filter, HousePlus } from "lucide-react";
 import { ButtonChooseDownload, ButtonOutline, ButtonSolid } from "../commons/ListButton";
 import FragTableHeader from "../commons/TableHeader";
 import { FragTableBody } from "../commons/TableBody";
@@ -68,7 +68,7 @@ export function HopitalTable<TData, TValue>({
               }}
             />
             <ButtonOutline name={"Upload"} icon={<CloudUpload />} />
-            <ButtonSolid name={"Add new"} icon={<UserRoundPlus />} onClick={() => handleNavigate("/hopital/contact-create")} />
+            <ButtonSolid name={"Thêm mới"} icon={<HousePlus />} onClick={() => handleNavigate("/hopital/contact-create")} />
           </div>
           <div className="flex input-wrapper relative gap-2 justify-between">
             <div className="relative w-full">

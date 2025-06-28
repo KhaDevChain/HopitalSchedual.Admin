@@ -91,11 +91,8 @@ export const ButtonChooseDownload = (props: {
             <AlertDialogAction
               onClick={
                 () => handleDownload(
-                  (
-                    props.onDownload.arguments[0] === "excel") ? 
-                        props.onDownload.arguments[2] + ".xlsx" : 
-                        props.onDownload.arguments[2] + ".json"
-                  )
+                  `${props.id}.${selectedType === "excel" ? "xlsx" : "json"}`
+                )
               }
               disabled={!selectedType}
               className="bg-blue-500 shadow-none hover:bg-blue-400"

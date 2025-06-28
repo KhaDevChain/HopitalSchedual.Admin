@@ -6,6 +6,12 @@ import { Switch } from "../ui/switch";
 import { ArrowLeft } from "lucide-react";
 import { StackedInput } from "../commons/ListInput";
 import { useRef, useState } from "react";
+import { HopitalModel } from "@/models/Hopital.model";
+import { HopitalTypeEnum } from "@/types/enum/hopitaltype.enum";
+import { ActivateEnum } from "@/types/enum/action.enum";
+import HopitalService from "@/services/Hopital.service";
+import { completed, failed } from "@/utils/alert.util";
+
 const HopitalItem = ({ id }: { id?: any }) => {
     const [imageSrc, setImageSrc] = useState("https://ecme-react.themenate.net/img/avatars/thumb-1.jpg"); // Default image
     const fileInputRef = useRef<HTMLInputElement>(null); // Reference to the file input
@@ -14,8 +20,9 @@ const HopitalItem = ({ id }: { id?: any }) => {
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
-        const imageUrl = URL.createObjectURL(file); // Create a local URL for the selected image
-        setImageSrc(imageUrl); // Update the image src
+            const imageUrl = URL.createObjectURL(file); // Create a local URL for the selected image
+            setImageSrc(imageUrl); // Update the image src
+            setFormData({ ...formData, logo: file.name });
         }
     };
 
@@ -51,6 +58,7 @@ const HopitalItem = ({ id }: { id?: any }) => {
     const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = e.target.files;
         if (files && files.length > 0) handleFiles(files);
+        setFormData({ ...formData, contract: contractName });
     };
 
     // Simulate file upload process
@@ -74,6 +82,30 @@ const HopitalItem = ({ id }: { id?: any }) => {
         });
         }, 500);
     };
+
+    // Gán sẵn giá trị cho formData
+    const [formData, setFormData] = useState<HopitalModel>({
+        uniqueId: "",
+        name: "",
+        code: "",
+        address: "",
+        email: "",
+        type: HopitalTypeEnum.NHA_NUOC,
+        taxCode: "",
+        website: "",
+        openWork: "",
+        closeWork: "",
+        logo: "",
+        contract: "",
+        representName: "",
+        representPhone: "",
+        representJob: "",
+        activated: ActivateEnum.ACTIVE,
+        createdAt: "",
+        doctors: [],
+    });
+
+    
     
     return (
         <>
@@ -84,45 +116,69 @@ const HopitalItem = ({ id }: { id?: any }) => {
                         <div className="bg-white p-5 rounded-xl border border-gray-200">
                             <h4 className="font-bold text-xl mb-6">Tổng quan</h4>
                             <div className="flex flex-col lg:flex-row gap-4 w-auto mb-7">
-                                <StackedInput id="hopitalCode" label="Mã bệnh viện" placeholder="* nhập mã bệnh viện" isRequired={true} />
-                                <StackedInput id="hopitalName" label="Tên bệnh viện" placeholder="* nhập tên bệnh viện" isRequired={true} />
+                                <StackedInput id="hopitalCode" label="Mã bệnh viện" placeholder="* nhập mã bệnh viện" isRequired={true} 
+                                    value={formData.code}
+                                    onChange={(e) => setFormData({ ...formData, code: e.target.value })}
+                                />
+                                <StackedInput id="hopitalName" label="Tên bệnh viện" placeholder="* nhập tên bệnh viện" isRequired={true} 
+                                    value={formData.name}
+                                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                />
                             </div>
                             <div className="grid w-full items-center gap-1.5 mb-7">
                                 <Label htmlFor="hopitalAddress">Địa chỉ bệnh viện <span className="text-red-500">*</span></Label>
-                                <Input className="bg-gray-100 h-12 rounded-xl border focus-visible:ring-blue-500 focus:border-blue-500" type="text" id="hopitalAddress" placeholder="* nhập địa chỉ bệnh viện" />
+                                <Input type="text" id="hopitalAddress" placeholder="* nhập địa chỉ bệnh viện" className="bg-gray-100 h-12 rounded-xl border focus-visible:ring-blue-500 focus:border-blue-500"
+                                    value={formData.address}
+                                    onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                                />
                             </div>
                             <div className="grid w-full items-center gap-1.5 mb-7">
                                 <Label htmlFor="hopitalEmail">Email</Label>
-                                <Input className="bg-gray-100 h-12 rounded-xl border focus-visible:ring-blue-500 focus:border-blue-500" type="email" id="hopitalEmail" placeholder="* nhập email" />
+                                <Input type="email" id="hopitalEmail" placeholder="* nhập email" className="bg-gray-100 h-12 rounded-xl border focus-visible:ring-blue-500 focus:border-blue-500" 
+                                    value={formData.email}
+                                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                />
                             </div>
                             <div className="grid w-full items-center gap-1.5 mb-7">
                                 <Label>Loại bệnh viện <span className="text-red-500">*</span></Label>
                                 <div className="flex flex-col lg:flex-row gap-4">
-                                    <Select>
+                                    <Select value={formData.type} onValueChange={(value) => setFormData({ ...formData, type: value as HopitalTypeEnum })}>
                                         <SelectTrigger className="h-12 lg:w-1/6 sm:w-full rounded-xl bg-gray-100 border focus-visible:ring-blue-500 focus:border-blue-500 focus:bg-white">
-                                            <SelectValue placeholder="- Chọn loại -" />
+                                            <SelectValue vocab="" placeholder="- Chọn loại -" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="1">Nhà nước</SelectItem>
-                                            <SelectItem value="2">Tư nhân</SelectItem>
-                                            <SelectItem value="3">Công lập</SelectItem>
-                                            <SelectItem value="4">Quốc tế</SelectItem>
-                                            <SelectItem value="5">Phòng khám</SelectItem>
+                                            <SelectItem value="NHA_NUOC">Nhà nước</SelectItem>
+                                            <SelectItem value="TU_NHAN">Tư nhân</SelectItem>
+                                            <SelectItem value="CONG_LAP">Công lập</SelectItem>
+                                            <SelectItem value="QUOC_TE">Quốc tế</SelectItem>
+                                            <SelectItem value="PHONG_KHAM">Phòng khám</SelectItem>
                                         </SelectContent>
                                     </Select>
-                                    <Input className="bg-gray-100 h-12 rounded-xl border focus-visible:ring-blue-500 focus:border-blue-500" type="phone" id="hopitalWeb" placeholder="* nhập địa chỉ website" />
+                                    <Input type="text" id="hopitalWeb" placeholder="* nhập địa chỉ website" className="bg-gray-100 h-12 rounded-xl border focus-visible:ring-blue-500 focus:border-blue-500"
+                                        value={formData.website}
+                                        onChange={(e) => setFormData({ ...formData, website: e.target.value })}
+                                    />
                                 </div>
                             </div>
                             <div className="flex flex-col lg:flex-row gap-4 w-auto mb-7">
-                                <StackedInput id="hopitalTax" label="Mã số thuế" placeholder="* nhập mã số thuế" isRequired={true} />
+                                <StackedInput id="hopitalTax" label="Mã số thuế" placeholder="* nhập mã số thuế" isRequired={true} 
+                                    value={formData.taxCode}
+                                    onChange={(e) => setFormData({ ...formData, taxCode: e.target.value })}
+                                />
                                 <div className="flex w-full lg:flex-row gap-4 w-auto">
                                     <div className="grid w-full items-center gap-1.5">
                                         <Label htmlFor="hopitalOpen">Mở cửa vào</Label>
-                                        <Input className="bg-gray-100 h-12 rounded-xl border focus-visible:ring-blue-500 focus:border-blue-500" type="time" id="hopitalOpen" />
+                                        <Input type="time" id="hopitalOpen" className="bg-gray-100 h-12 rounded-xl border focus-visible:ring-blue-500 focus:border-blue-500" 
+                                            value={formData.openWork}
+                                            onChange={(e) => setFormData({ ...formData, openWork: e.target.value })}
+                                        />
                                     </div>
                                     <div className="grid w-full items-center gap-1.5">
                                         <Label htmlFor="hopitalClose">Đóng cửa vào</Label>
-                                        <Input className="bg-gray-100 h-12 rounded-xl border focus-visible:ring-blue-500 focus:border-blue-500" type="time" id="hopitalClose" />
+                                        <Input type="time" id="hopitalClose" className="bg-gray-100 h-12 rounded-xl border focus-visible:ring-blue-500 focus:border-blue-500"
+                                            value={formData.closeWork}
+                                            onChange={(e) => setFormData({ ...formData, closeWork: e.target.value })}
+                                        />
                                     </div>
                                 </div>
                             </div>
@@ -149,7 +205,7 @@ const HopitalItem = ({ id }: { id?: any }) => {
 
                                 <div
                                     className={`border-2 border-dashed p-6 text-center rounded-lg ${
-                                    isDragging ? "bg-blue-50 border-blue-300" : "bg-gray-50 border-gray-300"
+                                        isDragging ? "bg-blue-50 border-blue-300" : "bg-gray-50 border-gray-300"
                                     }`}
                                     onDragOver={handleDragOver}
                                     onDragLeave={handleDragLeave}
@@ -157,20 +213,20 @@ const HopitalItem = ({ id }: { id?: any }) => {
                                     onClick={() => document.getElementById("hopitalContract")?.click()}
                                 >
                                     <div className="flex justify-center mb-2">
-                                    <svg
-                                        width="50"
-                                        height="40"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        strokeWidth="2"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                    >
-                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                                        <polyline points="17 8 12 3 7 8"></polyline>
-                                        <line x1="12" y1="3" x2="12" y2="15"></line>
-                                    </svg>
+                                        <svg
+                                            width="50"
+                                            height="40"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            strokeWidth="2"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                        >
+                                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                            <polyline points="17 8 12 3 7 8"></polyline>
+                                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                                        </svg>
                                     </div>
                                     <p className="text-gray-600">Kéo tệp vào đây để tải lên hoặc nhấp để chọn tệp</p>
                                     <p className="text-xs text-gray-500">
@@ -217,17 +273,26 @@ const HopitalItem = ({ id }: { id?: any }) => {
                             <div className="flex gap-4 w-auto mb-7">
                                 <div className="grid w-full items-center gap-1.5">
                                     <Label htmlFor="cpName">Họ và tên</Label>
-                                    <Input className="bg-gray-100 h-12 rounded-xl border focus-visible:ring-blue-500 focus:border-blue-500" type="text" id="cpName" placeholder="* nhập họ và tên người đại diện" />
+                                    <Input className="bg-gray-100 h-12 rounded-xl border focus-visible:ring-blue-500 focus:border-blue-500" type="text" id="cpName" placeholder="* nhập họ và tên người đại diện" 
+                                        value={formData.representName}
+                                        onChange={(e) => setFormData({ ...formData, representName: e.target.value })}
+                                    />
                                 </div>
                             </div>
                             <div className="grid w-full items-center gap-1.5 mb-7">
                                 <Label htmlFor="cpPhone">Số điện thoại</Label>
-                                <Input className="bg-gray-100 h-12 rounded-xl border focus-visible:ring-blue-500 focus:border-blue-500" type="text" id="cpPhone" placeholder="* nhập số điện thoại" />
+                                <Input className="bg-gray-100 h-12 rounded-xl border focus-visible:ring-blue-500 focus:border-blue-500" type="text" id="cpPhone" placeholder="* nhập số điện thoại" 
+                                    value={formData.representPhone}
+                                    onChange={(e) => setFormData({ ...formData, representPhone: e.target.value })}
+                                />
                             </div>
                             
                             <div className="grid w-full items-center gap-1.5 mb-7">
                                 <Label htmlFor="cpJob">Vị trí công việc</Label>
-                                <Input className="bg-gray-100 h-12 rounded-xl border focus-visible:ring-blue-500 focus:border-blue-500" type="text" id="cpJob" placeholder="* nhập vị trí vai trò" />
+                                <Input className="bg-gray-100 h-12 rounded-xl border focus-visible:ring-blue-500 focus:border-blue-500" type="text" id="cpJob" placeholder="* nhập vị trí vai trò" 
+                                    value={formData.representJob}
+                                    onChange={(e) => setFormData({ ...formData, representJob: e.target.value })}
+                                />
                             </div>
                         </div>
                     </div>
@@ -265,7 +330,9 @@ const HopitalItem = ({ id }: { id?: any }) => {
                                         <h4 className="font-bold">Vô hiệu lực</h4>
                                         <span className="text-sm text-gray-600">Vô hiệu hóa tài khoản</span>
                                     </div>
-                                    <Switch aria-label="switch-banned" id="hopitalActivated" className="data-[state=checked]:bg-blue-600 h-6" />
+                                    <Switch aria-label="switch-banned" id="hopitalActivated" className="data-[state=checked]:bg-blue-600 h-6" 
+                                        onCheckedChange={(checked) => setFormData({ ...formData, activated: checked ? ActivateEnum.ACTIVE : ActivateEnum.INACTIVE })}
+                                    />
                                 </div>
                             </div>
                         </div>
@@ -279,7 +346,22 @@ const HopitalItem = ({ id }: { id?: any }) => {
                             <a href="/hopital/list" className="font-bold">Trở lại</a>
                         </div>
                         <div className="flex">
-                            <Button className="h-12 rounded-xl px-4 bg-blue-500 text-white border-2 border-blue-500 shadow-none hover:bg-blue-400">Lưu lại thông tin</Button>
+                            <Button className="h-12 rounded-xl px-4 bg-blue-500 text-white border-2 border-blue-500 shadow-none hover:bg-blue-400"
+                                onClick={async () => {
+                                    try {
+                                        const res = await HopitalService.create(formData);
+                                        if (res.status === 200) {
+                                            completed(res.message);
+                                            window.location.href = "/hopital/list";
+                                        } else {
+                                            failed("Lỗi khi tạo bệnh viện: " + res.message);
+                                        } 
+                                    }
+                                    catch (error) {
+                                        failed("Lỗi khi tạo bệnh viện: " + error);
+                                    }
+                                }}
+                            >Lưu lại thông tin</Button>
                         </div>
                     </div>
                 </div>
