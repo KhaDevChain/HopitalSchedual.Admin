@@ -350,7 +350,7 @@ const HopitalItem = ({ id }: { id?: any }) => {
                                 onClick={async () => {
                                     try {
                                         const res = await HopitalService.create(formData);
-                                        if (res.status === 200) {
+                                        if (res.code === 200) {
                                             completed(res.message);
                                             window.location.href = "/hopital/list";
                                         } else {

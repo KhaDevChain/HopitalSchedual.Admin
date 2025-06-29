@@ -46,49 +46,19 @@ export const Layout = (props: Props) => {
 /**
  * Private Layout 
  */
-interface PrivateLayoutProps {
-  children: React.ReactNode;
-}
-
-export const PrivateLayout: React.FC<PrivateLayoutProps> = ({ children }) => {
+export const PrivateLayout: React.FC<{children: React.ReactNode}> = ({ children }) => {
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const { user, loading } = useAuth();
 
   useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const user = await AuthService.getCurrentUser();
-        
-        if (user == null) {
-          const newAccessToken = await AuthService.refreshToken();
-          if (newAccessToken.code === 200) {
-            console.log(user);
-            
-            const refreshedUser = await AuthService.getCurrentUser();
-            setIsAuthenticated(refreshedUser !== null);
-          } else {
-            setIsAuthenticated(false);
-            navigate('/signin');
-          }
-        } else {
-          console.log(user);
-          
-          setIsAuthenticated(true);
-        }
-      } catch (error) {
-        setIsAuthenticated(false);
-      }
-      finally {
-        setLoading(false);
-      }
-    };
-    checkAuth();
-  }, [navigate]);
+    if (!loading && !user) {
+      navigate('/signin');
+    }
+  }, [loading, user, navigate]);
 
   if (loading) return <Loader className={`animate-spin`} />;
 
-  return isAuthenticated ? <>{children}</> : null;
+  return user ? <>{children}</> : null;
 };
 
 
@@ -98,19 +68,41 @@ export const PrivateLayout: React.FC<PrivateLayoutProps> = ({ children }) => {
 interface AuthContextType {
   user: User | null;
   setUser: React.Dispatch<React.SetStateAction<User | null>>;
+  loading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    AuthService.getCurrentUser().then(setUser).catch(() => setUser(null));
+    const initAuth = async () => {
+      try {
+        let currentUser = await AuthService.getCurrentUser();
+
+        if (!currentUser) {
+          const refreshRes = await AuthService.refreshToken();
+          if (refreshRes.code === 200) {
+            currentUser = await AuthService.getCurrentUser();
+          }
+        }
+
+        if (currentUser) setUser(currentUser);
+        else setUser(null);
+      } catch {
+        setUser(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    initAuth();
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, setUser }}>
+    <AuthContext.Provider value={{ user, setUser, loading }}>
       {children}
     </AuthContext.Provider>
   );

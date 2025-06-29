@@ -1,6 +1,6 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "../components/ui/button";
-import { ChevronsUpDown, Eye, Pen } from "lucide-react";
+import { Eye, Pen } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox"
 import { Link } from "react-router-dom";
 import { HopitalTable } from "@/components/hopital/HopitalList";
@@ -14,8 +14,13 @@ function Hopital() {
 
     useEffect(() => {
         const fetchHospitals = async () => {
-        const response = await HopitalService.getAll();
-            setHospitals(response); // Cập nhật state
+            const response = await HopitalService.getAll();            
+            // Check if response is valid and contains hopitals
+            if (response && response.hopitals && response.code === 200) {
+                setHospitals(response.hopitals);
+            } else {
+                setHospitals([]);
+            }
         };
 
         fetchHospitals();
@@ -43,80 +48,83 @@ function Hopital() {
             enableHiding: false,
         },
         {
-            accessorKey: "name",
-            header: ({ column }) => (
-                <Button
-                    variant={"ghost"}
-                    type="button"
-                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>{"Tên Bệnh viện"}
-                    <ChevronsUpDown className="ml-2 h-4 w-4" />
-                </Button>),
-            cell: ({ row }) => <div className="flex items-center">
-                <img src="https://ecme-react.themenate.net/img/avatars/thumb-1.jpg" alt="Profile" className="w-10 h-10 rounded-full" />
-                <a className="ml-2 font-bold">{row.original.name}</a>
-            </div>,
+            accessorKey: "logo",
+            header: "Logo",
+            cell: ({ row }) => (
+                <img
+                    src={row.original.logo}
+                    alt={row.original.name}
+                    className="w-10 h-10 rounded-md object-cover"
+                />
+            ),
+            size: 30,
         },
         {
             accessorKey: "code",
-            header: ({ column }) => (
-                <Button
-                    variant={"ghost"}
-                    type="button"
-                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>{"Mã Bệnh viện"}
-                    <ChevronsUpDown className="ml-2 h-4 w-4" />
-                </Button>),
-            cell: ({ row }) => <div className="flex items-center">
-                <img src="https://ecme-react.themenate.net/img/avatars/thumb-1.jpg" alt="Profile" className="w-10 h-10 rounded-full" />
-                <a className="ml-2 font-bold">{row.original.name}</a>
-            </div>,
+            header: "Mã",
+            cell: ({ row }) => <span>{row.original.code}</span>,
+        },
+        {
+            accessorKey: "name",
+            header: "Tên Bệnh viện",
+            cell: ({ row }) => (
+            <span className="font-semibold whitespace-normal break-words max-w-xs">
+                {row.original.name}
+            </span>
+            ),
+            size: 330,
         },
         {
             accessorKey: "email",
-            header: ({ column }) => {
-                return (<Button
-                    type="button"
-                    variant="ghost"
-                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>{"Email"}
-                    <ChevronsUpDown className="ml-2 h-4 w-4" />
-                </Button>);
-            },
-        },
-        {
-            accessorKey: "location",
-            header: "Địa chỉ",
-        },
-        {
-            accessorKey: "status",
-            header: ({ column }) => (
-                <Button
-                    type="button" variant={"ghost"}
-                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>{"Trạng thái"}
-                    <ChevronsUpDown className="ml-2 h-4 w-4" />
-                </Button>
+            header: "Email",
+            cell: ({ row }) => (
+            <span className="truncate block max-w-[180px]">{row.original.email}</span>
             ),
-            cell: ({ row }) => {
-                return row.original.activated === ActivateEnum.ACTIVE ?
-                    (<div className="bg-emerald-200 w-fit py-[4px] px-[10px] rounded-lg font-bold mx-4">
-                        <span>Active</span>
-                    </div>) :
-                    (<div className="bg-red-200 w-fit py-[4px] px-[10px] rounded-lg font-bold mx-4">
-                        <span>Inactive</span>
-                    </div>)
-            }
+            size: 200,
+        },
+        {
+            accessorKey: "address",
+            header: "Địa chỉ",
+            cell: ({ row }) => (
+            <span className="whitespace-normal break-words max-w-sm">
+                {row.original.address}
+            </span>
+            ),
+            size: 250,
+        },
+        {
+            accessorKey: "activated",
+            header: "Trạng thái",
+            cell: ({ row }) =>
+            row.original.activated === ActivateEnum.ACTIVE ? (
+                <span className="bg-green-100 text-green-800 text-sm px-2 py-1 rounded-md font-medium">
+                Active
+                </span>
+            ) : (
+                <span className="bg-red-100 text-red-800 text-sm px-2 py-1 rounded-md font-medium">
+                Inactive
+                </span>
+            ),
+            size: 100,
         },
         {
             accessorKey: "actions",
             header: "",
             cell: ({ row }) => (
-            (<div className="flex gap-x-1">
-                <Button id={row.id} type="button" className="px-2 bg-transparent shadow-none text-gray-600 hover:bg-none hover:bg-transparent" aria-label="pen">
-                    <Link to={`/hopital/contact-edit`}>< Pen /></Link>
+            <div className="flex gap-2">
+                <Link to={`/hopital/contact-edit/${row.original.uniqueId}`}>
+                <Button variant="ghost" size="icon">
+                    <Pen className="w-4 h-4 text-gray-600" />
                 </Button>
-                <Button type="button" className="px-2 bg-transparent shadow-none text-gray-600 hover:bg-none hover:bg-transparent" aria-label="eye">
-                    <Link to={`/hopital/contact-details`} >< Eye /></Link>
+                </Link>
+                <Link to={`/hopital/contact-details/${row.original.uniqueId}`}>
+                <Button variant="ghost" size="icon">
+                    <Eye className="w-4 h-4 text-gray-600" />
                 </Button>
-            </div>)
-            )
+                </Link>
+            </div>
+            ),
+            size: 80,
         },
     ];
     // data of table

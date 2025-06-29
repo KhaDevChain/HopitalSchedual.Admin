@@ -5,12 +5,12 @@ export class HopitalResponse {
         public code?: number,
         public message?: string,
         public hopital?: HopitalModel|null,
-        public list?: HopitalModel[]|[]
+        public hopitals?: HopitalModel[]|null
     ) {
         this.code = code;
         this.message = message;
         this.hopital = hopital;
-        this.list = list;
+        this.hopitals = hopitals;
     }
 }
 

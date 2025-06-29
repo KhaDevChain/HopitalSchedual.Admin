@@ -8,8 +8,9 @@ class HopitalService {
   static async getAll(): Promise<HopitalResponse|any> {
     try {
       const res = await HttpService.get("/hopital/all");
+      const hopitalListRaw = res.data.hopitals;      
 
-      const hospitals: HopitalModel[] = (res.data as any[]).map((item) => {
+      const hospitals: HopitalModel[] = hopitalListRaw.map((item: any) => {
         return new HopitalModel(
           item.uniqueId,
           item.name,
@@ -24,6 +25,7 @@ class HopitalService {
           item.logo,
           item.contract ?? "",
           item.representName ?? "",
+          item.representPhone ?? "",
           item.representJob ?? "",
           item.activated as ActivateEnum,
           item.createdAt ?? "",
@@ -71,9 +73,11 @@ class HopitalService {
   static async create(hospital: HopitalModel): Promise<HopitalResponse|any> {
     try {
       const res = await HttpService.post("/hopital/save", hospital);
-      return new HopitalResponse(res.status, "Tạo bệnh viện thành công", null, res.data);
+      console.log(res.data);
+      
+      return new HopitalResponse(res.status, "Tạo bệnh viện thành công", res.data, []);
     } catch (error) {
-      return [];
+      return null;
     }
   }
 }
