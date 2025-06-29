@@ -11,10 +11,12 @@ import { HopitalTypeEnum } from "@/types/enum/hopitaltype.enum";
 import { ActivateEnum } from "@/types/enum/action.enum";
 import HopitalService from "@/services/Hopital.service";
 import { completed, failed } from "@/utils/alert.util";
+import FileService from "@/services/file/File.service";
 
 const HopitalItem = ({ id }: { id?: any }) => {
-    const [imageSrc, setImageSrc] = useState("https://ecme-react.themenate.net/img/avatars/thumb-1.jpg"); // Default image
+    const [imageSrc, setImageSrc] = useState("https://w7.pngwing.com/pngs/659/551/png-transparent-house-illustration-greenhouse-logo-environmentally-friendly-green-home-green-house-building-text-environmental.png"); // Default image
     const fileInputRef = useRef<HTMLInputElement>(null); // Reference to the file input
+    const [logoFile, setLogoFile] = useState<File>();
 
     // Handle file selection and update image src
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -23,6 +25,7 @@ const HopitalItem = ({ id }: { id?: any }) => {
             const imageUrl = URL.createObjectURL(file); // Create a local URL for the selected image
             setImageSrc(imageUrl); // Update the image src
             setFormData({ ...formData, logo: file.name });
+            setLogoFile(file); // Store the selected file
         }
     };
 
@@ -351,8 +354,20 @@ const HopitalItem = ({ id }: { id?: any }) => {
                                     try {
                                         const res = await HopitalService.create(formData);
                                         if (res.code === 200) {
-                                            completed(res.message);
-                                            window.location.href = "/hopital/list";
+                                            if (logoFile) {
+                                                const resUpload = await FileService.upload(logoFile);
+                                                
+                                                if (resUpload) {
+                                                    completed(res.message); 
+                                                    window.location.href = "/hopital/list";
+                                                } else {
+                                                    failed("Lỗi khi tải lên logo");
+                                                }
+                                            }
+                                            else {
+                                                completed(res.message);
+                                                window.location.href = "/hopital/list";
+                                            }
                                         } else {
                                             failed("Lỗi khi tạo bệnh viện: " + res.message);
                                         } 

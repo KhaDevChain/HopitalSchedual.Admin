@@ -8,6 +8,7 @@ import { HopitalModel } from "@/models/Hopital.model";
 import { ActivateEnum } from "@/types/enum/action.enum";
 import { useEffect, useState } from "react";
 import HopitalService from "@/services/Hopital.service";
+import { Global } from "@/Global";
 
 function Hopital() {
     const [listHopital, setHospitals] = useState<HopitalModel[]>([]);
@@ -52,17 +53,12 @@ function Hopital() {
             header: "Logo",
             cell: ({ row }) => (
                 <img
-                    src={row.original.logo}
+                    src={Global().baseUrl + "/assets/hopital/" + row.original.logo}
                     alt={row.original.name}
                     className="w-10 h-10 rounded-md object-cover"
                 />
             ),
             size: 30,
-        },
-        {
-            accessorKey: "code",
-            header: "Mã",
-            cell: ({ row }) => <span>{row.original.code}</span>,
         },
         {
             accessorKey: "name",
@@ -91,6 +87,11 @@ function Hopital() {
             </span>
             ),
             size: 250,
+        },
+        {
+            accessorKey: "code",
+            header: "Mã",
+            cell: ({ row }) => <span>{row.original.code}</span>,
         },
         {
             accessorKey: "activated",
@@ -129,7 +130,7 @@ function Hopital() {
     ];
     // data of table
     return (
-        <div className="mx-auto px-2">
+        <div className="mx-auto px-2 overflow-x-auto">
             <HopitalTable columns={columns} data={listHopital} />
         </div>
     )

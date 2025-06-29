@@ -26,14 +26,14 @@ class HttpService {
 
   static async post<T = any>(url: string, data?: object, headers?: object): Promise<AxiosResponse<T>> {
     const config: AxiosRequestConfig = {
-      headers,
+      ...headers,
     };
     return this.instance.post(url, data, config);
   }
 
   static async put<T = any>(url: string, data?: object, headers?: object): Promise<AxiosResponse<T>> {
     const config: AxiosRequestConfig = {
-      headers,
+      ...headers,
     };
     return this.instance.put(url, data, config);
   }
@@ -41,7 +41,7 @@ class HttpService {
   static async delete<T = any>(url: string, data?: object, headers?: object): Promise<AxiosResponse<T>> {
     const config: AxiosRequestConfig = {
       data,
-      headers,
+      ...headers,
     };
     return this.instance.delete(url, config);
   }

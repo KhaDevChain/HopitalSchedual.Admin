@@ -72,9 +72,7 @@ class HopitalService {
 
   static async create(hospital: HopitalModel): Promise<HopitalResponse|any> {
     try {
-      const res = await HttpService.post("/hopital/save", hospital);
-      console.log(res.data);
-      
+      const res = await HttpService.post("/hopital/save", hospital);      
       return new HopitalResponse(res.status, "Tạo bệnh viện thành công", res.data, []);
     } catch (error) {
       return null;
