@@ -359,14 +359,18 @@ const HopitalItem = ({ id }: { id?: any }) => {
                                                 
                                                 if (resUpload) {
                                                     completed(res.message); 
-                                                    window.location.href = "/hopital/list";
+                                                    setTimeout(() => {
+                                                        window.location.href = "/hopital/list";
+                                                    }, 2000);
                                                 } else {
                                                     failed("Lỗi khi tải lên logo");
                                                 }
                                             }
                                             else {
                                                 completed(res.message);
-                                                window.location.href = "/hopital/list";
+                                                setTimeout(() => {
+                                                    window.location.href = "/hopital/list";
+                                                }, 2000);
                                             }
                                         } else {
                                             failed("Lỗi khi tạo bệnh viện: " + res.message);
