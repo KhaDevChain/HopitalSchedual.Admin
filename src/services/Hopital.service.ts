@@ -41,8 +41,8 @@ class HopitalService {
 
   static async getById(id: string): Promise<HopitalResponse|any> {
     try {
-      const res = await HttpService.get(`/hopital/${id}`);
-      const item = res.data;
+      const res = await HttpService.get(`/hopital/findById/${id}`);
+      const item = res.data.hopital;      
 
       const hospital = new HopitalModel(
         item.uniqueId,
@@ -58,6 +58,7 @@ class HopitalService {
         item.logo,
         item.contract ?? "",
         item.representName ?? "",
+        item.representPhone ?? "",
         item.representJob ?? "",
         item.activated as ActivateEnum,
         item.createdAt ?? "",
@@ -74,6 +75,15 @@ class HopitalService {
     try {
       const res = await HttpService.post("/hopital/save", hospital);      
       return new HopitalResponse(res.status, "Tạo bệnh viện thành công", res.data, []);
+    } catch (error) {
+      return null;
+    }
+  }
+
+  static async edit(hospital: HopitalModel): Promise<HopitalResponse|any> {
+    try {
+      const res = await HttpService.post("/hopital/edit", hospital);      
+      return new HopitalResponse(res.status, "Cập nhật thành công", res.data, []);
     } catch (error) {
       return null;
     }

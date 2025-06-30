@@ -7,9 +7,9 @@ import { Loader } from 'lucide-react';
 // Pages
 const SignIn = React.lazy(() => import('./views/Signin'));
 const Home = React.lazy(() => import('./views/Home'));
-const People = React.lazy(() => import('./views/People'));
-const PeopleItem = React.lazy(() => import('./components/people/PeopleItem'));
-const ContractList = React.lazy(() => import('./components/people/ContractList'));
+// const People = React.lazy(() => import('./views/People'));
+// const PeopleItem = React.lazy(() => import('./components/people/PeopleItem'));
+// const ContractList = React.lazy(() => import('./components/people/ContractList'));
 const Hopital = React.lazy(() => import('./views/Hopital'));
 const HopitalItem = React.lazy(() => import('./components/hopital/HopitalItem'));
 const HopitalContractList = React.lazy(() => import('./components/hopital/_HopitalContractList'));
@@ -27,12 +27,13 @@ const EmployeeCheck = React.lazy(() => import('./views/CheckinCheckout'));
 // Define private routes
 const privateRoutes = [
   { path: '/*', element: <Home /> },
-  { path: '/peoples/contact', element: <People /> },
-  { path: '/peoples/contact-edit', element: <PeopleItem /> },
-  { path: '/peoples/contact-create', element: <PeopleItem /> },
-  { path: '/peoples/contract', element: <ContractList /> },
+  // { path: '/peoples/contact', element: <People /> },
+  // { path: '/peoples/contact-edit', element: <PeopleItem /> },
+  // { path: '/peoples/contact-create', element: <PeopleItem /> },
+  // { path: '/peoples/contract', element: <ContractList /> },
   { path: '/hopital/list', element: <Hopital /> },
-  { path: '/hopital/contact-edit', element: <HopitalItem /> },
+  { path: '/hopital/contact-edit/:id', element: <HopitalItem /> },
+  { path: '/hopital/contact-details/:id', element: <HopitalItem /> },
   { path: '/hopital/contact-create', element: <HopitalItem /> },
   { path: '/hopital/contract', element: <HopitalContractList /> },
   { path: '/clients/client-details', element: <ClientDetails /> },

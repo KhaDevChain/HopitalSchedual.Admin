@@ -9,14 +9,13 @@ import {
   useReactTable,
 } from "@tanstack/react-table"
 import { Table } from "@/components/ui/table"
-import React, { useState } from "react";
-import { CloudDownload, CloudUpload, Filter, HousePlus } from "lucide-react";
+import React from "react";
+import { CloudDownload, CloudUpload, HousePlus } from "lucide-react";
 import { ButtonChooseDownload, ButtonOutline, ButtonSolid } from "../commons/ListButton";
 import FragTableHeader from "../commons/TableHeader";
 import { FragTableBody } from "../commons/TableBody";
 import FragTableFooter from "../commons/TableFooter";
 import { useNavigate } from "react-router-dom";
-import FilterPopup from "./_HopitalFilterPopup";
 import "./assets/client.css";
 import { Global } from "@/Global";
 
@@ -50,37 +49,37 @@ export function HopitalTable<TData, TValue>({
 	const handleNavigate = (href: string) => {
 		navigate(href);
 	};
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
   const config = Global();
   return (
     <>
       <div className="border p-5 bg-white rounded-2xl">
         <div className="flex flex-col gap-4">
-          <div className="flex items-center">
+          <div className="flex row flex-row items-center">
             <h3 className="font-bold text-2xl grow">Mục Bệnh Viện</h3>
-            <ButtonChooseDownload
-              id="invoice-001"
-              icon={<CloudDownload />}
-              name="Tải về"
-              url={config.baseUrl + "/api/hopital/all"}
-              onDownload={(type, id) => {
-                console.log("Download", type, "for", id);
-              }}
-            />
-            <ButtonOutline name={"Upload"} icon={<CloudUpload />} />
-            <ButtonSolid name={"Thêm mới"} icon={<HousePlus />} onClick={() => handleNavigate("/hopital/contact-create")} />
+            <div>
+              <ButtonChooseDownload
+                id="invoice-001"
+                icon={<CloudDownload />}
+                name="Tải về"
+                url={config.baseUrl + "/api/hopital/all"}
+                onDownload={(type, id) => {
+                  console.log("Download", type, "for", id);
+                }}
+              />
+              <ButtonOutline name={"Upload"} icon={<CloudUpload />} />
+              <ButtonSolid name={"Thêm mới"} icon={<HousePlus />} onClick={() => handleNavigate("/hopital/contact-create")} />
+            </div>
+
           </div>
           <div className="flex input-wrapper relative gap-2 justify-between">
             <div className="relative w-full">
-              <input title="search" type="text" placeholder="Quick search..."
+              <input title="search" type="text" placeholder="Tìm kiếm nhanh ..."
                 className="border-none py-[8px] ps-[12px] pe-[34px] rounded-xl h-[47.99px] font-medium w-full bg-[#F5F5F5] focus:bg-white outline-blue-400"
                 onChange={(e) => table.getColumn("name")?.setFilterValue(e.target.value)}
                 value={table.getColumn("name")?.getFilterValue() as string ?? ""}
               />
             </div>
-            <ButtonOutline name={"Filter"} icon={<Filter />} onClick={() => setIsFilterOpen(true)} />
           </div>
-          <FilterPopup isOpen={isFilterOpen} onClose={() => setIsFilterOpen(false)} />
           <Table>
             {
               /* 

@@ -5,17 +5,58 @@ import { Button } from "../ui/button";
 import { Switch } from "../ui/switch";
 import { ArrowLeft } from "lucide-react";
 import { StackedInput } from "../commons/ListInput";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { HopitalModel } from "@/models/Hopital.model";
 import { HopitalTypeEnum } from "@/types/enum/hopitaltype.enum";
 import { ActivateEnum } from "@/types/enum/action.enum";
 import HopitalService from "@/services/Hopital.service";
 import { completed, failed } from "@/utils/alert.util";
 import FileService from "@/services/file/File.service";
+import { useParams } from "react-router-dom";
+import { Global } from "@/Global";
+import { IconsType } from "./contract/FileIcons";
 
-const HopitalItem = ({ id }: { id?: any }) => {
-    const [imageSrc, setImageSrc] = useState("https://w7.pngwing.com/pngs/659/551/png-transparent-house-illustration-greenhouse-logo-environmentally-friendly-green-home-green-house-building-text-environmental.png"); // Default image
-    const fileInputRef = useRef<HTMLInputElement>(null); // Reference to the file input
+const HopitalItem = () => {
+    const { id } = useParams();
+    const [formData, setFormData] = useState<HopitalModel>({
+        uniqueId: "",
+        name: "",
+        code: "",
+        address: "",
+        email: "",
+        type: HopitalTypeEnum.NHA_NUOC,
+        taxCode: "",
+        website: "",
+        openWork: "",
+        closeWork: "",
+        logo: "",
+        contract: "",
+        representName: "",
+        representPhone: "",
+        representJob: "",
+        activated: ActivateEnum.ACTIVE,
+        createdAt: "",
+        doctors: [],
+    });
+    
+    useEffect(() => {
+        const fetchHopital = async () => {
+            if (id) {
+                const response = await HopitalService.getById(id);
+                
+                if (response && response.hopital && response.code === 200) {
+                    setFormData(response.hopital);
+                    setImageSrc(`${Global().baseUrl}/assets/hopital/${response.hopital.logo}`);
+                    setContractName(response.hopital.contract);
+                }
+            }
+        };
+
+        fetchHopital();
+    }, [id]);
+
+    const [imageSrc, setImageSrc] = useState("https://www.shutterstock.com/image-vector/house-logo-template-design-vector-600nw-741515455.jpg"); // Default image
+    const fileLogoInputRef = useRef<HTMLInputElement>(null); // Reference to the file input
     const [logoFile, setLogoFile] = useState<File>();
 
     // Handle file selection and update image src
@@ -30,8 +71,12 @@ const HopitalItem = ({ id }: { id?: any }) => {
     };
 
     // Trigger file input click
-    const handleButtonClick = () => {
-        fileInputRef.current?.click(); // Programmatically click the hidden file input
+    const handleButtonLogoClick = () => {
+        fileLogoInputRef.current?.click(); // Programmatically click the hidden file input
+    };
+
+    const handleButtonContractClick = () => {
+        fileContractInputRef.current?.click(); // Programmatically click the hidden file input
     };
 
 
@@ -57,63 +102,32 @@ const HopitalItem = ({ id }: { id?: any }) => {
         if (files.length > 0) handleFiles(files);
     };
 
-    // Handle file input change
-    const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const files = e.target.files;
-        if (files && files.length > 0) handleFiles(files);
-        setFormData({ ...formData, contract: contractName });
-    };
-
     // Simulate file upload process
     const [hidden, setHidden] = useState(false);
+    const fileContractInputRef = useRef<HTMLInputElement>(null); // Reference to the file input
     const [contractName, setContractName] = useState("");
-    const handleFiles = (files: FileList) => {
-        setIsUploading(true);
-        setProgress(0);
+    const [contractFile, setContractFile] = useState<File>();
 
-        // Simulate upload progress (replace with actual upload logic)
-        const interval = setInterval(() => {
-        setProgress((prev) => {
-            if (prev >= 100) {
-                clearInterval(interval);
-                setIsUploading(false);
-                setHidden(true);
-                setContractName(files[0].name); // Store the name of the uploaded file
-                return 100;
-            }
-            return prev + 10;
-        });
-        }, 500);
+    // Handle file input change
+    const handleFiles = (files: FileList) => {
+        const file = files[0];
+        setHidden(true);
+        setContractName(file.name);
+        setContractFile(file);
+        setFormData(prev => ({ ...prev, contract: file.name }));
     };
 
-    // Gán sẵn giá trị cho formData
-    const [formData, setFormData] = useState<HopitalModel>({
-        uniqueId: "",
-        name: "",
-        code: "",
-        address: "",
-        email: "",
-        type: HopitalTypeEnum.NHA_NUOC,
-        taxCode: "",
-        website: "",
-        openWork: "",
-        closeWork: "",
-        logo: "",
-        contract: "",
-        representName: "",
-        representPhone: "",
-        representJob: "",
-        activated: ActivateEnum.ACTIVE,
-        createdAt: "",
-        doctors: [],
-    });
-
-    
+    const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const files = e.target.files;
+        if (files && files.length > 0) {
+            handleFiles(files);
+        }
+    };
     
     return (
         <>
             <div className="mx-auto">
-                <h3 className="font-bold text-2xl mb-4">{id ? "Chỉnh sửa bệnh viện " + id : "Tạo mới bệnh viện"}</h3>
+                <h3 className="font-bold text-2xl mb-4">{id ? "Chỉnh sửa bệnh viện " : "Tạo mới bệnh viện"}</h3>
                 <form action="POST" className="flex flex-col lg:flex-row w-full h-full gap-4 min-h-screen ">
                     <div className="w-full lg:w-9/12 rounded-xl flex flex-col border-1 border-gray-300 gap-y-4">
                         <div className="bg-white p-5 rounded-xl border border-gray-200">
@@ -187,14 +201,49 @@ const HopitalItem = ({ id }: { id?: any }) => {
                             </div>
                             <div className="grid w-full items-center gap-1.5 mb-7">
                                 <Label htmlFor="hopitalEmail">Hợp đồng hợp tác</Label>
+                                {
+                                    id && formData.contract && (
+                                        <div key={formData.uniqueId} className="bg-white rounded-2xl mb-4 dark:bg-gray-800 border border-gray-200 dark:border-transparent py-4 px-3.5 flex items-center justify-between transition-all hover:shadow" role="button">
+                                            <div className="flex items-center">
+                                                <div className="text-3xl me-2">
+                                                {
+                                                    <IconsType fileType={formData.contract.split('.')[1]} width="40" height="40" />
+                                                }
+                                                </div>
+                                                <div>
+                                                <div className="font-bold heading-text truncate hover:text-blue-600"
+                                                    onClick={() => {
+                                                        window.open(`${Global().baseUrl}/assets/hopital/${formData.contract}`, '_blank');
+                                                    }}
+                                                >{formData.contract}</div>
+                                                    <span className="text-xs">10MB</span>
+                                                </div>
+                                            </div>
+                                            <div className="dropdown-toggle" role="menuitem" aria-expanded="false" aria-haspopup="menu" id=":r13:">
+                                                <button className="button dark:primary-mild dark:bg-opacity-20 hover:text-primary-mild dark:active:primary-mild dark:active:bg-opacity-40 h-8 rounded-full w-8 inline-flex items-center justify-center text-base button-press-feedback">
+                                                    <svg
+                                                        stroke="currentColor" fill="none"
+                                                        strokeWidth="2" viewBox="0 0 24 24"
+                                                        strokeLinecap="round" strokeLinejoin="round"
+                                                        height="1em" width="1em"
+                                                        xmlns="http://www.w3.org/2000/svg">
+                                                        <path d="M5 12m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"></path>
+                                                        <path d="M12 12m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"></path>
+                                                        <path d="M19 12m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"></path>
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                        </div>  
+                                    )
+                                }
                                 <div className="p-4 border rounded-lg">
                                 <div className="mb-4">
                                     <label className="block text-sm text-gray-600">
-                                    Tải ảnh lên album hiện có hoặc tạo album mới:
+                                        Tải ảnh lên album hiện có hoặc tạo album mới:
                                     </label>
                                     <div className="flex items-center">
                                     {
-                                        hidden && (
+                                        hidden && contractName.length > 0 && (
                                             <div
                                                 id="fileInput"
                                                 className="flex-1 p-2 mt-2 border rounded-l-md font-bold text-red-400"
@@ -213,7 +262,7 @@ const HopitalItem = ({ id }: { id?: any }) => {
                                     onDragOver={handleDragOver}
                                     onDragLeave={handleDragLeave}
                                     onDrop={handleDrop}
-                                    onClick={() => document.getElementById("hopitalContract")?.click()}
+                                    onClick={handleButtonContractClick}
                                 >
                                     <div className="flex justify-center mb-2">
                                         <svg
@@ -235,12 +284,12 @@ const HopitalItem = ({ id }: { id?: any }) => {
                                     <p className="text-xs text-gray-500">
                                         Bằng cách tải lên những hình ảnh này, bạn chứng nhận rằng bạn được phép chia sẻ chúng.
                                     </p>
-                                    <input
-                                        id="hopitalContract"
+                                    <Input
+                                        ref={fileContractInputRef}
+                                        className="hidden" // Hide the input
                                         type="file"
-                                        className="hidden"
-                                        onChange={handleFileInput}
-                                        multiple
+                                        id="hopitalContract"
+                                        onChange={handleFileInput} // Handle file selection
                                     />
                                 </div>
 
@@ -306,10 +355,10 @@ const HopitalItem = ({ id }: { id?: any }) => {
                                 <img
                                     src={imageSrc}
                                     alt="Profile"
-                                    className="w-1/3 h-1/3 rounded-full border-4 border-white"
+                                    className="w-1/3 h-1/3 rounded-3xl border-4 border-white"
                                     />
                                 <Input
-                                    ref={fileInputRef} // Attach the ref to the input
+                                    ref={fileLogoInputRef} // Attach the ref to the input
                                     className="hidden" // Hide the input
                                     type="file"
                                     id="hopitalLogo"
@@ -318,7 +367,7 @@ const HopitalItem = ({ id }: { id?: any }) => {
                                 />
                                 <button
                                     type="button"
-                                    onClick={handleButtonClick} // Trigger file input click
+                                    onClick={handleButtonLogoClick} // Trigger file input click
                                     className="my-3 text-white font-semibold p-2 h-12 bg-blue-600 data-[state=hover]:bg-blue-500 hover:bg-blue-500 rounded-xl"
                                     >
                                     Tải hình ảnh
@@ -333,7 +382,7 @@ const HopitalItem = ({ id }: { id?: any }) => {
                                         <h4 className="font-bold">Vô hiệu lực</h4>
                                         <span className="text-sm text-gray-600">Vô hiệu hóa tài khoản</span>
                                     </div>
-                                    <Switch aria-label="switch-banned" id="hopitalActivated" className="data-[state=checked]:bg-blue-600 h-6" 
+                                    <Switch aria-label="switch-banned" id="hopitalActivated" className="data-[state=checked]:bg-blue-600 h-6" checked={formData.activated === ActivateEnum.ACTIVE}
                                         onCheckedChange={(checked) => setFormData({ ...formData, activated: checked ? ActivateEnum.ACTIVE : ActivateEnum.INACTIVE })}
                                     />
                                 </div>
@@ -351,36 +400,63 @@ const HopitalItem = ({ id }: { id?: any }) => {
                         <div className="flex">
                             <Button className="h-12 rounded-xl px-4 bg-blue-500 text-white border-2 border-blue-500 shadow-none hover:bg-blue-400"
                                 onClick={async () => {
-                                    try {
-                                        const res = await HopitalService.create(formData);
+                                    try {                 
+                                        // Tạo hoặc cập nhật bệnh viện
+                                        const res = id 
+                                            ? await HopitalService.edit(formData)
+                                            : await HopitalService.create(formData);
+
                                         if (res.code === 200) {
+                                            // Upload các file nếu có
+                                            const uploadResults = [];
+
                                             if (logoFile) {
-                                                const resUpload = await FileService.upload(logoFile);
-                                                
-                                                if (resUpload) {
-                                                    completed(res.message); 
-                                                    setTimeout(() => {
-                                                        window.location.href = "/hopital/list";
-                                                    }, 2000);
-                                                } else {
+                                                try {
+                                                     const logoUpload = await FileService.upload(logoFile, "hopital");
+                                                    if (!logoUpload) {
+                                                        setFormData(prev => ({ ...prev, logo: "" }));
+                                                        failed("Lỗi khi tải lên logo");
+                                                    } else {
+                                                        uploadResults.push("logo");
+                                                    }
+                                                } catch (error) {
+                                                    setFormData(prev => ({ ...prev, logo: "" }));
                                                     failed("Lỗi khi tải lên logo");
                                                 }
+                                               
                                             }
-                                            else {
-                                                completed(res.message);
-                                                setTimeout(() => {
-                                                    window.location.href = "/hopital/list";
-                                                }, 2000);
+
+                                            if (contractFile) {
+                                                try {
+                                                    const contractUpload = await FileService.upload(contractFile, "hopital");
+                                                    if (!contractUpload) {
+                                                        setFormData(prev => ({ ...prev, contract: "" }));
+                                                        failed("Lỗi khi tải lên hợp đồng");
+                                                    } else {
+                                                        uploadResults.push("contract");
+                                                    }
+                                                } catch (error) {
+                                                    setFormData(prev => ({ ...prev, contract: "" }));
+                                                    failed("Lỗi khi tải lên hợp đồng");
+                                                }
                                             }
+
+                                            completed(id ? "Cập nhật thành công" : "Tạo mới thành công");
+
+                                            setTimeout(() => {
+                                                window.location.href = "/hopital/list";
+                                            }, 1500);
                                         } else {
-                                            failed("Lỗi khi tạo bệnh viện: " + res.message);
-                                        } 
+                                            failed("Lỗi khi tạo/cập nhật bệnh viện: " + res.message);
+                                        }
                                     }
                                     catch (error) {
-                                        failed("Lỗi khi tạo bệnh viện: " + error);
+                                        failed(error instanceof Error ? error.message : "Đã xảy ra lỗi không xác định");
                                     }
                                 }}
-                            >Lưu lại thông tin</Button>
+                            >
+                                {id ? "Cập nhật ngay" : "+ Lưu thông tin"}
+                            </Button>
                         </div>
                     </div>
                 </div>
