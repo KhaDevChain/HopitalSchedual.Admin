@@ -17,7 +17,7 @@ export class HopitalModel {
   closeWork?: string;
   logo: string;
   contract?: string;
-  contractSize?: number;
+  contractSize?: number|null;
   representName?: string;
   representPhone?: string;
   representJob?: string;

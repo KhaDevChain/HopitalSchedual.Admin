@@ -31,7 +31,7 @@ const HopitalItem = () => {
         closeWork: "",
         logo: "",
         contract: "",
-        contractSize: -1,
+        contractSize: null,
         representName: "",
         representPhone: "",
         representJob: "",
@@ -137,7 +137,7 @@ const HopitalItem = () => {
         <>
             <div className="mx-auto">
                 <h3 className="font-bold text-2xl mb-4">{id ? "Chỉnh sửa bệnh viện " : "Tạo mới bệnh viện"}</h3>
-                <form action="POST" className="flex flex-col lg:flex-row w-full h-full gap-4 min-h-screen ">
+                <form className="flex flex-col lg:flex-row w-full h-full gap-4 min-h-screen ">
                     <div className="w-full lg:w-9/12 rounded-xl flex flex-col border-1 border-gray-300 gap-y-4">
                         <div className="bg-white p-5 rounded-xl border border-gray-200">
                             <h4 className="font-bold text-xl mb-6">Tổng quan</h4>
@@ -229,14 +229,18 @@ const HopitalItem = () => {
                                                     {
                                                         contractFile ? 
                                                             (Math.ceil(contractFile.size / 1024) + " KB") : 
-                                                            formData.contractSize !== undefined && formData.contractSize > 0 ? 
+                                                            formData.contractSize && formData.contractSize > 0 ? 
                                                                 formData.contractSize + " KB" : "... KB"
                                                     }
                                                     </span>
                                                 </div>
                                             </div>
                                             <div className="dropdown-toggle" role="menuitem" aria-expanded="false" aria-haspopup="menu" id=":r13:">
-                                                <button className="button dark:primary-mild dark:bg-opacity-20 hover:text-primary-mild dark:active:primary-mild dark:active:bg-opacity-40 h-8 rounded-full w-3 inline-flex items-center justify-center text-base button-press-feedback">
+                                                <button type="button" className="button dark:primary-mild dark:bg-opacity-20 hover:text-primary-mild dark:active:primary-mild dark:active:bg-opacity-40 h-8 rounded-full w-3 inline-flex items-center justify-center text-base button-press-feedback"
+                                                    onClick={() => {
+                                                        setFormData(prev => ({ ...prev, contract: "", contractSize: null }));
+                                                    }}
+                                                >
                                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512">
                                                         <path d="M376.6 84.5c11.3-13.6 9.5-33.8-4.1-45.1s-33.8-9.5-45.1 4.1L192 206 56.6 43.5C45.3 29.9 25.1 28.1 11.5 39.4S-3.9 70.9 7.4 84.5L150.3 256 7.4 427.5c-11.3 13.6-9.5 33.8 4.1 
                                                             45.1s33.8 9.5 45.1-4.1L192 306 327.4 468.5c11.3 13.6 31.5 15.4 45.1 4.1s15.4-31.5 4.1-45.1L233.7 256 376.6 84.5z"/>
