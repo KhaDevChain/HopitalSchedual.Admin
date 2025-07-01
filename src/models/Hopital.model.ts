@@ -17,6 +17,7 @@ export class HopitalModel {
   closeWork?: string;
   logo: string;
   contract?: string;
+  contractSize?: number;
   representName?: string;
   representPhone?: string;
   representJob?: string;
@@ -37,6 +38,7 @@ export class HopitalModel {
     closeWork: string,
     logo: string,
     contract: string,
+    contractSize: number,
     representName: string,
     representPhone: string,
     representJob: string,
@@ -56,6 +58,7 @@ export class HopitalModel {
     this.closeWork = closeWork;
     this.logo = logo;
     this.contract = contract;
+    this.contractSize = contractSize;
     this.representName = representName;
     this.representPhone = representPhone;
     this.representJob = representJob;

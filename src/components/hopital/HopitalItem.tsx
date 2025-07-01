@@ -31,6 +31,7 @@ const HopitalItem = () => {
         closeWork: "",
         logo: "",
         contract: "",
+        contractSize: -1,
         representName: "",
         representPhone: "",
         representJob: "",
@@ -55,18 +56,22 @@ const HopitalItem = () => {
         fetchHopital();
     }, [id]);
 
-    const [imageSrc, setImageSrc] = useState("https://www.shutterstock.com/image-vector/house-logo-template-design-vector-600nw-741515455.jpg"); // Default image
-    const fileLogoInputRef = useRef<HTMLInputElement>(null); // Reference to the file input
+    const [imageSrc, setImageSrc] = useState("https://www.shutterstock.com/image-vector/house-logo-template-design-vector-600nw-741515455.jpg");
+    const fileLogoInputRef = useRef<HTMLInputElement>(null);
     const [logoFile, setLogoFile] = useState<File>();
 
     // Handle file selection and update image src
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
-        if (file) {
-            const imageUrl = URL.createObjectURL(file); // Create a local URL for the selected image
-            setImageSrc(imageUrl); // Update the image src
+        if (file && file.size <= 10 * 1024 * 1024) {
+            const imageUrl = URL.createObjectURL(file);
+            setImageSrc(imageUrl);
             setFormData({ ...formData, logo: file.name });
-            setLogoFile(file); // Store the selected file
+            setLogoFile(file);
+        }
+        else {
+            failed("Kích thước tệp không được vượt quá 10MB");
+            return;
         }
     };
 
@@ -111,10 +116,14 @@ const HopitalItem = () => {
     // Handle file input change
     const handleFiles = (files: FileList) => {
         const file = files[0];
+        if (file.size > 10 * 1024 * 1024) { // Check if file size exceeds 5MB
+            failed("Kích thước tệp không được vượt quá 10MB");
+            return;
+        }
         setHidden(true);
         setContractName(file.name);
         setContractFile(file);
-        setFormData(prev => ({ ...prev, contract: file.name }));
+        setFormData(prev => ({ ...prev, contract: file.name, contractSize: Math.ceil(file.size / 1024) }));
     };
 
     const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -216,20 +225,21 @@ const HopitalItem = () => {
                                                         window.open(`${Global().baseUrl}/assets/hopital/${formData.contract}`, '_blank');
                                                     }}
                                                 >{formData.contract}</div>
-                                                    <span className="text-xs">10MB</span>
+                                                    <span className="text-xs">
+                                                    {
+                                                        contractFile ? 
+                                                            (Math.ceil(contractFile.size / 1024) + " KB") : 
+                                                            formData.contractSize !== undefined && formData.contractSize > 0 ? 
+                                                                formData.contractSize + " KB" : "... KB"
+                                                    }
+                                                    </span>
                                                 </div>
                                             </div>
                                             <div className="dropdown-toggle" role="menuitem" aria-expanded="false" aria-haspopup="menu" id=":r13:">
-                                                <button className="button dark:primary-mild dark:bg-opacity-20 hover:text-primary-mild dark:active:primary-mild dark:active:bg-opacity-40 h-8 rounded-full w-8 inline-flex items-center justify-center text-base button-press-feedback">
-                                                    <svg
-                                                        stroke="currentColor" fill="none"
-                                                        strokeWidth="2" viewBox="0 0 24 24"
-                                                        strokeLinecap="round" strokeLinejoin="round"
-                                                        height="1em" width="1em"
-                                                        xmlns="http://www.w3.org/2000/svg">
-                                                        <path d="M5 12m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"></path>
-                                                        <path d="M12 12m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"></path>
-                                                        <path d="M19 12m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"></path>
+                                                <button className="button dark:primary-mild dark:bg-opacity-20 hover:text-primary-mild dark:active:primary-mild dark:active:bg-opacity-40 h-8 rounded-full w-3 inline-flex items-center justify-center text-base button-press-feedback">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512">
+                                                        <path d="M376.6 84.5c11.3-13.6 9.5-33.8-4.1-45.1s-33.8-9.5-45.1 4.1L192 206 56.6 43.5C45.3 29.9 25.1 28.1 11.5 39.4S-3.9 70.9 7.4 84.5L150.3 256 7.4 427.5c-11.3 13.6-9.5 33.8 4.1 
+                                                            45.1s33.8 9.5 45.1-4.1L192 306 327.4 468.5c11.3 13.6 31.5 15.4 45.1 4.1s15.4-31.5 4.1-45.1L233.7 256 376.6 84.5z"/>
                                                     </svg>
                                                 </button>
                                             </div>
