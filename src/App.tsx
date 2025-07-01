@@ -33,7 +33,6 @@ const privateRoutes = [
   // { path: '/peoples/contract', element: <ContractList /> },
   { path: '/hopital/list', element: <Hopital /> },
   { path: '/hopital/contact-edit/:id', element: <HopitalItem /> },
-  { path: '/hopital/contact-details/:id', element: <HopitalItem /> },
   { path: '/hopital/contact-create', element: <HopitalItem /> },
   { path: '/hopital/contract', element: <HopitalContractList /> },
   { path: '/clients/client-details', element: <ClientDetails /> },

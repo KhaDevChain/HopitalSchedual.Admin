@@ -1,7 +1,9 @@
+import { UploadCloud } from "lucide-react";
 import { ExcelIcon, JsonIcon } from "../icons/Icons";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "../ui/alert-dialog";
 import { Button } from "../ui/button"
 import { ReactNode, useState } from "react"
+import { Global } from "@/Global";
 
 // loại button có màu nền
 export const ButtonSolid = (props: { name: string, icon: ReactNode, onClick?: () => void }) => {
@@ -98,6 +100,84 @@ export const ButtonChooseDownload = (props: {
               className="bg-blue-500 shadow-none hover:bg-blue-400"
             >
               Đồng ý
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
+
+  );
+};
+
+
+export const ButtonChooseUpload = (props: {
+  id: string;
+  icon: React.ReactElement;
+  name: string;
+  url?: string;
+}) => {
+  const [open, setOpen] = useState(false);
+
+  const handleUpload = (url:string) => {
+    if (true) {
+      console.log(url);
+    }
+  };
+
+  return (
+    <>
+      <Button onClick={() => setOpen(true)} variant={"outline"} type="button" className="ms-3 h-12 px-5 py-2 rounded-xl text-gray-600 hover:text-blue-600 hover:border-blue-600  hover:bg-white ">
+        {props.icon}
+        <span>{props.name}</span>
+      </Button>
+      <AlertDialog open={open} onOpenChange={setOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Chọn định dạng mà bạn muốn tải về</AlertDialogTitle>
+            <AlertDialogDescription>
+              Vui lòng chọn định dạng tải về cho dữ liệu của bạn
+            </AlertDialogDescription>
+            <br />
+            <AlertDialogDescription className="flex justify-center gap-3">
+              <a href={Global().baseUrl + "/assets/hopital/Hopital_thong_tin.xlsx"} download className={`p-2 w-full flex items-center font-bold shadow-md rounded`}>
+                <ExcelIcon size={48} /> Tải danh sách excel theo mẫu trước
+              </a>
+            </AlertDialogDescription>
+            <div className="border-2 border-dashed border-gray-300 rounded-md p-6 text-center mt-4">
+              <p className="text-lg font-semibold mb-2">Select File here</p>
+              <p className="text-sm text-gray-500 mb-4">
+                Files Supported: PDF, TEXT, DOC, DOCX
+              </p>
+
+              <label htmlFor="fileUpload" className="inline-block bg-blue-600 text-white font-semibold px-6 py-2 rounded-md cursor-pointer hover:bg-blue-500">
+                Choose File
+              </label>
+              <input
+                id="fileUpload"
+                type="file"
+                accept=".pdf,.txt,.doc,.docx"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    console.log("File selected:", file.name);
+                    // bạn có thể set vào state hoặc xử lý tại đây
+                  }
+                }}
+                className="hidden"
+              />
+            </div>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Hủy bỏ</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={
+                () => handleUpload(
+                  `Tiến hành upload`
+                )
+              }
+              className="bg-blue-500 shadow-none hover:bg-blue-400"
+            >
+              Tiến hành upload
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

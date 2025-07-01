@@ -11,7 +11,7 @@ import {
 import { Table } from "@/components/ui/table"
 import React from "react";
 import { CloudDownload, CloudUpload, HousePlus } from "lucide-react";
-import { ButtonChooseDownload, ButtonOutline, ButtonSolid } from "../commons/ListButton";
+import { ButtonChooseDownload, ButtonChooseUpload, ButtonSolid } from "../commons/ListButton";
 import FragTableHeader from "../commons/TableHeader";
 import { FragTableBody } from "../commons/TableBody";
 import FragTableFooter from "../commons/TableFooter";
@@ -66,7 +66,13 @@ export function HopitalTable<TData, TValue>({
                   console.log("Download", type, "for", id);
                 }}
               />
-              <ButtonOutline name={"Upload"} icon={<CloudUpload />} />
+
+              <ButtonChooseUpload
+                id="invoice-001"
+                icon={<CloudUpload />}
+                name="Upload"
+                url={config.baseUrl + "assets/hopital/Hopital_thong_tin.xlsx"}
+              />
               <ButtonSolid name={"Thêm mới"} icon={<HousePlus />} onClick={() => handleNavigate("/hopital/contact-create")} />
             </div>
 

@@ -1,6 +1,6 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "../components/ui/button";
-import { Eye, Pen } from "lucide-react";
+import { PenLine } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox"
 import { Link } from "react-router-dom";
 import { HopitalTable } from "@/components/hopital/HopitalList";
@@ -71,10 +71,10 @@ function Hopital() {
             size: 330,
         },
         {
-            accessorKey: "email",
-            header: "Email",
+            accessorKey: "taxCode",
+            header: "Mã số thuế",
             cell: ({ row }) => (
-            <span className="truncate block max-w-[180px]">{row.original.email}</span>
+            <span className="truncate block max-w-[180px]">{row.original.taxCode}</span>
             ),
             size: 200,
         },
@@ -114,14 +114,9 @@ function Hopital() {
             cell: ({ row }) => (
             <div className="flex gap-2">
                 <Link to={`/hopital/contact-edit/${row.original.uniqueId}`}>
-                <Button variant="ghost" size="icon">
-                    <Pen className="w-4 h-4 text-gray-600" />
-                </Button>
-                </Link>
-                <Link to={`/hopital/contact-details/${row.original.uniqueId}`}>
-                <Button variant="ghost" size="icon">
-                    <Eye className="w-4 h-4 text-gray-600" />
-                </Button>
+                    <Button variant="ghost" size="icon">
+                        <PenLine className="w-4 h-4 text-gray-600" />
+                    </Button>
                 </Link>
             </div>
             ),
