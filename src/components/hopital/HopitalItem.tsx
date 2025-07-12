@@ -148,7 +148,7 @@ const HopitalItem = () => {
                                 />
                                 <StackedInput id="hopitalName" label="Tên bệnh viện" placeholder="* nhập tên bệnh viện" isRequired={true} 
                                     value={formData.name}
-                                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                    onChange={(e) => setFormData({ ...formData, name: e.target.value.toUpperCase() })}
                                 />
                             </div>
                             <div className="grid w-full items-center gap-1.5 mb-7">

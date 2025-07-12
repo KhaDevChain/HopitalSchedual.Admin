@@ -1,9 +1,9 @@
-import { UploadCloud } from "lucide-react";
 import { ExcelIcon, JsonIcon } from "../icons/Icons";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "../ui/alert-dialog";
 import { Button } from "../ui/button"
 import { ReactNode, useState } from "react"
 import { Global } from "@/Global";
+import { Hospital, readHospitalExcelFile } from "@/utils/uploadfile.util";
 
 // loại button có màu nền
 export const ButtonSolid = (props: { name: string, icon: ReactNode, onClick?: () => void }) => {
@@ -57,14 +57,6 @@ export const ButtonChooseDownload = (props: {
     }
   };
 
-  const handleDownloadJson = () => {
-    
-  };
-
-  const handleDownloadExcel = () => {
-    
-  };
-
   return (
     <>
       <Button onClick={() => setOpen(true)} variant={"outline"} type="button" className="ms-3 h-12 px-5 py-2 rounded-xl text-gray-600 hover:text-blue-600 hover:border-blue-600  hover:bg-white ">
@@ -109,7 +101,6 @@ export const ButtonChooseDownload = (props: {
   );
 };
 
-
 export const ButtonChooseUpload = (props: {
   id: string;
   icon: React.ReactElement;
@@ -117,64 +108,147 @@ export const ButtonChooseUpload = (props: {
   url?: string;
 }) => {
   const [open, setOpen] = useState(false);
+  const [hospitals, setHospitals] = useState<Hospital[]>([]);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
-  const handleUpload = (url:string) => {
-    if (true) {
-      console.log(url);
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setSelectedFile(file);
+      console.log("File selected:", file.name);
     }
+  };
+
+  const handleUpload = async () => {
+    if (!selectedFile) {
+      alert("Vui lòng chọn file trước khi upload.");
+      return;
+    }
+    try {
+      const hospitals = await readHospitalExcelFile(selectedFile);
+      setHospitals(hospitals);
+      console.log("Dữ liệu bệnh viện:", hospitals);
+    } catch (error) {
+      console.error("Lỗi đọc file:", error);
+    }
+  };
+
+  const handleLogoUpload = (index: number, file: File) => {
+    console.log("Upload logo cho dòng", index, "file:", file.name);
+    // TODO: Xử lý upload thực tế ở đây
   };
 
   return (
     <>
-      <Button onClick={() => setOpen(true)} variant={"outline"} type="button" className="ms-3 h-12 px-5 py-2 rounded-xl text-gray-600 hover:text-blue-600 hover:border-blue-600  hover:bg-white ">
+      <Button
+        onClick={() => setOpen(true)}
+        variant="outline"
+        type="button"
+        className="ms-3 h-12 px-5 py-2 rounded-xl text-gray-600 hover:text-blue-600 hover:border-blue-600 hover:bg-white"
+      >
         {props.icon}
         <span>{props.name}</span>
       </Button>
-      <AlertDialog open={open} onOpenChange={setOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Chọn định dạng mà bạn muốn tải về</AlertDialogTitle>
-            <AlertDialogDescription>
-              Vui lòng chọn định dạng tải về cho dữ liệu của bạn
-            </AlertDialogDescription>
-            <br />
-            <AlertDialogDescription className="flex justify-center gap-3">
-              <a href={Global().baseUrl + "/assets/hopital/Hopital_thong_tin.xlsx"} download className={`p-2 w-full flex items-center font-bold shadow-md rounded`}>
-                <ExcelIcon size={48} /> Tải danh sách excel theo mẫu trước
-              </a>
-            </AlertDialogDescription>
-            <div className="border-2 border-dashed border-gray-300 rounded-md p-6 text-center mt-4">
-              <p className="text-lg font-semibold mb-2">Select File here</p>
-              <p className="text-sm text-gray-500 mb-4">
-                Files Supported: PDF, TEXT, DOC, DOCX
-              </p>
 
-              <label htmlFor="fileUpload" className="inline-block bg-blue-600 text-white font-semibold px-6 py-2 rounded-md cursor-pointer hover:bg-blue-500">
-                Choose File
+      <AlertDialog open={open} onOpenChange={setOpen}>
+        <AlertDialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Tải danh sách bệnh viện bằng Excel</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tải file mẫu và chọn file đúng định dạng để hiển thị dữ liệu.
+            </AlertDialogDescription>
+
+            <div className="mt-4 flex justify-center">
+              <a
+                href={Global().baseUrl + "/assets/hopital/Hopital_thong_tin.xlsx"}
+                download
+                className="p-2 flex items-center gap-2 font-bold bg-gray-100 hover:bg-gray-200 rounded shadow"
+              >
+                <ExcelIcon size={32} />
+                Tải danh sách Excel mẫu
+              </a>
+            </div>
+
+            <div className="mt-6 border-2 border-dashed border-gray-300 rounded-md p-6 text-center">
+              <p className="text-lg font-semibold mb-2">Chọn File Excel</p>
+              <p className="text-sm text-gray-500 mb-4">Chỉ hỗ trợ định dạng: .xlsx</p>
+
+              <label
+                htmlFor="fileUpload"
+                className="inline-block bg-blue-600 text-white font-semibold px-6 py-2 rounded-md cursor-pointer hover:bg-blue-500"
+              >
+                Chọn File
               </label>
               <input
                 id="fileUpload"
                 type="file"
-                accept=".pdf,.txt,.doc,.docx"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) {
-                    console.log("File selected:", file.name);
-                    // bạn có thể set vào state hoặc xử lý tại đây
-                  }
-                }}
+                accept=".xlsx"
+                onChange={handleFileChange}
                 className="hidden"
               />
+              {selectedFile && (
+                <p className="text-sm text-green-600 mt-2">Đã chọn: {selectedFile.name}</p>
+              )}
             </div>
+
+            {/* Bảng hiển thị dữ liệu */}
+            {hospitals.length > 0 && (
+              <div className="overflow-x-auto border rounded-md">
+                <table className="table-auto border-collapse">
+                  <thead className="bg-gray-100 sticky top-0 z-10">
+                    <tr>
+                      {Object.keys(hospitals[0]).map((key, i) => (
+                        <th
+                          key={i}
+                          className="border px-4 py-2 text-sm font-semibold text-gray-700 text-left whitespace-nowrap"
+                        >
+                          {key}
+                        </th>
+                      ))}
+                      <th className="border px-4 py-2 text-sm font-semibold text-gray-700 text-left whitespace-nowrap">
+                        Tải logo
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {hospitals.map((row, index) => (
+                      <tr key={index} className="hover:bg-gray-50">
+                        {Object.values(row).map((val, i) => (
+                          <td
+                            key={i}
+                            className="border px-4 py-2 align-top text-sm whitespace-normal break-words max-w-[300px]"
+                            style={{ width: 'max-content' }}
+                          >
+                            {val}
+                          </td>
+                        ))}
+                        <td className="border px-4 py-2">
+                          <label className="cursor-pointer text-blue-600 hover:underline">
+                            <input
+                              type="file"
+                              accept="image/*"
+                              hidden
+                              onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) handleLogoUpload(index, file);
+                              }}
+                            />
+                            Tải logo
+                          </label>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+            )}
           </AlertDialogHeader>
+
           <AlertDialogFooter>
-            <AlertDialogCancel>Hủy bỏ</AlertDialogCancel>
+            <AlertDialogCancel>Hủy</AlertDialogCancel>
             <AlertDialogAction
-              onClick={
-                () => handleUpload(
-                  `Tiến hành upload`
-                )
-              }
+              onClick={handleUpload}
               className="bg-blue-500 shadow-none hover:bg-blue-400"
             >
               Tiến hành upload
@@ -183,6 +257,5 @@ export const ButtonChooseUpload = (props: {
         </AlertDialogContent>
       </AlertDialog>
     </>
-
   );
 };
